@@ -1,4 +1,4 @@
-resource "aws_security_group" "external_lb" {
+resource "aws_security_group" "external_lb_https" {
   name        = "${var.vpc_name}_external_lb"
   description = "External security group"
   vpc_id      = "${aws_vpc.main_vpc.id}"
@@ -25,28 +25,20 @@ resource "aws_security_group" "external_lb" {
   }
 
   tags {
-    Name = "${var.vpc_name}_external"
-    VPC  = "${var.vpc_name}"
+    vpc = "${var.vpc_name}"
   }
 }
 
-resource "aws_security_group" "instance_lb" {
-  name        = "${var.vpc_name}_instance_lb"
+resource "aws_security_group" "instance_lb_https" {
+  name        = "${var.vpc_name}_instance_lb_https"
   description = "Internal instance security group"
   vpc_id      = "${aws_vpc.main_vpc.id}"
 
   ingress {
-    from_port = 80
-    to_port   = 80
-    protocol  = "tcp"
-    security_groups = ["${aws_security_group.external_lb.id}"]
-  }
-
-  ingress {
-    from_port = 443
-    to_port   = 443
-    protocol  = "tcp"
-    security_groups = ["${aws_security_group.external_lb.id}"]
+    from_port       = 443
+    to_port         = 443
+    protocol        = "tcp"
+    security_groups = ["${aws_security_group.external_lb_https.id}"]
   }
 
   egress {
@@ -57,8 +49,7 @@ resource "aws_security_group" "instance_lb" {
   }
 
   tags {
-    Name = "${var.vpc_name}_internal"
-    VPC  = "${var.vpc_name}"
+    vpc = "${var.vpc_name}"
   }
 }
 
@@ -82,8 +73,7 @@ resource "aws_security_group" "internal_instance" {
   }
 
   tags {
-    Name = "${var.vpc_name}_internal"
-    VPC  = "${var.vpc_name}"
+    vpc = "${var.vpc_name}"
   }
 }
 

@@ -1,0 +1,4 @@
+base_domain     = "coldog.xyz"
+cluster_name    = "default"
+dns_zone_id     = "Z3FHNMGH8LFH0Q"
+state_bucket    = "state.default.coldog.xyz"

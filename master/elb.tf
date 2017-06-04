@@ -15,7 +15,7 @@ resource "aws_elb" "master_api" {
     healthy_threshold   = 2
     unhealthy_threshold = 2
     timeout             = 5
-    target              = "HTTP:443/healthz"
+    target              = "TCP:443"
     interval            = 15
   }
 

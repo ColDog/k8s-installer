@@ -30,7 +30,7 @@ variable "state_bucket" {
 }
 
 variable "instance_size" {
-  default = "t2.micro"
+  default = "t2.small"
 }
 
 variable "ssh_key" {
@@ -59,4 +59,8 @@ variable "min" {
 
 variable "desired" {
   default = 1
+}
+
+output "api_server" {
+  value = "${aws_route53_record.api_server.fqdn}"
 }

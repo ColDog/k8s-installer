@@ -21,7 +21,7 @@ data "aws_region" "current" {
 
 data "ignition_config" "master_remote" {
   replace {
-    source = "https://s3-${data.aws_region.current.name}.amazonaws.com/${aws_s3_bucket_object.master_ignition.bucket}/${aws_s3_bucket_object.master_ignition.key}"
+    source       = "https://s3-${data.aws_region.current.name}.amazonaws.com/${aws_s3_bucket_object.master_ignition.bucket}/${aws_s3_bucket_object.master_ignition.key}"
     verification = "sha512-${sha512(data.ignition_config.master.rendered)}"
   }
 }
@@ -29,6 +29,7 @@ data "ignition_config" "master_remote" {
 data "ignition_config" "master" {
   systemd = [
     "${data.ignition_systemd_unit.apiserver.id}",
+    "${data.ignition_systemd_unit.controllermanager.id}",
   ]
 
   files = [
@@ -207,7 +208,7 @@ ExecStart=/usr/bin/docker run --name=kubernetes.controllermanager -v /etc/kubern
   --address=0.0.0.0 \
   --cluster-name=kubernetes \
   --leader-elect=true \
-  --master=http://127.0.0.0:80 \
+  --master=http://127.0.0.1:80 \
   --root-ca-file=/etc/kubernetes/secrets/ca.pem \
   --service-account-private-key-file=/etc/kubernetes/secrets/svcaccount-key.pem
 

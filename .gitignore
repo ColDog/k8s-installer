@@ -3,3 +3,5 @@
 *.tfstate*
 *.pem
 .terraform
+*.kubeconfig
+binaries/

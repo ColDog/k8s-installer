@@ -26,11 +26,11 @@ resource "aws_instance" "etcd_node" {
   count = "${var.instances}"
   ami   = "${data.aws_ami.coreos_ami.image_id}"
 
-  instance_type          = "${var.instance_type}"
-  subnet_id              = "${var.subnets[count.index]}"
-  key_name               = "${var.ssh_key_name}"
-  user_data              = "${data.ignition_config.etcd.*.rendered[count.index]}"
-  vpc_security_group_ids = ["${var.security_groups}"]
+  instance_type           = "${var.instance_type}"
+  subnet_id               = "${var.subnets[count.index]}"
+  key_name                = "${var.ssh_key_name}"
+  user_data               = "${data.ignition_config.etcd.*.rendered[count.index]}"
+  vpc_security_group_ids  = ["${var.security_groups}"]
   disable_api_termination = true
 
   iam_instance_profile = "${var.iam_etcd_profile_id}"
@@ -40,6 +40,7 @@ resource "aws_instance" "etcd_node" {
     # avoids accidental deletion of nodes whenever a new CoreOS Release comes
     # out.
     ignore_changes = ["ami"]
+
     prevent_destroy = true
   }
 
