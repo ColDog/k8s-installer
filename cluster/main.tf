@@ -54,12 +54,12 @@ variable "vpc_cidr_blocks" {
   ]
 }
 
-output "kube_api_domain" {
-  value = "${module.master.api_server}"
-}
+//output "api_server" {
+//  value = "${module.master.api_server}"
+//}
 
-output "base_domain" {
-  value = "${var.base_domain}"
+output "worker_user_data" {
+  value = "${module.worker.user_data}"
 }
 
 output "cluster_name" {

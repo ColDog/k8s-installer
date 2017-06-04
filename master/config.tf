@@ -1,31 +1,3 @@
-resource "random_id" "master_ignition" {
-  byte_length = 64
-
-  keepers = {
-    ignition_id = "${sha512(data.ignition_config.master.rendered)}"
-  }
-}
-
-resource "aws_s3_bucket_object" "master_ignition" {
-  acl                    = "public-read"
-  bucket                 = "${var.state_bucket}"
-  key                    = "ignition/master/${random_id.master_ignition.hex}.json"
-  content                = "${data.ignition_config.master.rendered}"
-  server_side_encryption = "AES256"
-  content_type           = "application/json"
-}
-
-data "aws_region" "current" {
-  current = true
-}
-
-data "ignition_config" "master_remote" {
-  replace {
-    source       = "https://s3-${data.aws_region.current.name}.amazonaws.com/${aws_s3_bucket_object.master_ignition.bucket}/${aws_s3_bucket_object.master_ignition.key}"
-    verification = "sha512-${sha512(data.ignition_config.master.rendered)}"
-  }
-}
-
 data "ignition_config" "master" {
   systemd = [
     "${data.ignition_systemd_unit.apiserver.id}",
@@ -33,119 +5,14 @@ data "ignition_config" "master" {
   ]
 
   files = [
-    "${data.ignition_file.ca_pem.id}",
-    "${data.ignition_file.svcaccount_pem.id}",
-    "${data.ignition_file.svcaccount_key_pem.id}",
-    "${data.ignition_file.apiserver_pem.id}",
-    "${data.ignition_file.apiserver_key_pem.id}",
-    "${data.ignition_file.kubelet_pem.id}",
-    "${data.ignition_file.kubelet_key_pem.id}",
+    "${var.ignition_files["ca_pem"]}",
+    "${var.ignition_files["svcaccount_pem"]}",
+    "${var.ignition_files["svcaccount_key_pem"]}",
+    "${var.ignition_files["apiserver_pem"]}",
+    "${var.ignition_files["apiserver_key_pem"]}",
+    "${var.ignition_files["kubelet_pem"]}",
+    "${var.ignition_files["kubelet_key_pem"]}",
   ]
-}
-
-data "aws_s3_bucket_object" "ca_pem" {
-  bucket = "${var.state_bucket}"
-  key    = "secrets/ca/ca.pem"
-}
-
-data "ignition_file" "ca_pem" {
-  path       = "/etc/kubernetes/secrets/ca.pem"
-  mode       = 0600
-  filesystem = "root"
-
-  content {
-    content = "${data.aws_s3_bucket_object.ca_pem.body}"
-  }
-}
-
-data "aws_s3_bucket_object" "svcaccount_pem" {
-  bucket = "${var.state_bucket}"
-  key    = "secrets/svcaccount/svcaccount.pem"
-}
-
-data "ignition_file" "svcaccount_pem" {
-  path       = "/etc/kubernetes/secrets/svcaccount.pem"
-  mode       = 0600
-  filesystem = "root"
-
-  content {
-    content = "${data.aws_s3_bucket_object.svcaccount_pem.body}"
-  }
-}
-
-data "aws_s3_bucket_object" "svcaccount_key_pem" {
-  bucket = "${var.state_bucket}"
-  key    = "secrets/svcaccount/svcaccount-key.pem"
-}
-
-data "ignition_file" "svcaccount_key_pem" {
-  path       = "/etc/kubernetes/secrets/svcaccount-key.pem"
-  mode       = 0600
-  filesystem = "root"
-
-  content {
-    content = "${data.aws_s3_bucket_object.svcaccount_key_pem.body}"
-  }
-}
-
-data "aws_s3_bucket_object" "apiserver_pem" {
-  bucket = "${var.state_bucket}"
-  key    = "secrets/apiserver/apiserver.pem"
-}
-
-data "ignition_file" "apiserver_pem" {
-  path       = "/etc/kubernetes/secrets/apiserver.pem"
-  mode       = 0600
-  filesystem = "root"
-
-  content {
-    content = "${data.aws_s3_bucket_object.apiserver_pem.body}"
-  }
-}
-
-data "aws_s3_bucket_object" "apiserver_key_pem" {
-  bucket = "${var.state_bucket}"
-  key    = "/secrets/apiserver/apiserver-key.pem"
-}
-
-data "ignition_file" "apiserver_key_pem" {
-  path       = "/etc/kubernetes/secrets/apiserver-key.pem"
-  mode       = 0600
-  filesystem = "root"
-
-  content {
-    content = "${data.aws_s3_bucket_object.apiserver_key_pem.body}"
-  }
-}
-
-data "aws_s3_bucket_object" "kubelet_pem" {
-  bucket = "${var.state_bucket}"
-  key    = "/secrets/kubelet/kubelet.pem"
-}
-
-data "ignition_file" "kubelet_pem" {
-  path       = "/etc/kubernetes/secrets/kubelet.pem"
-  mode       = 0600
-  filesystem = "root"
-
-  content {
-    content = "${data.aws_s3_bucket_object.kubelet_pem.body}"
-  }
-}
-
-data "aws_s3_bucket_object" "kubelet_key_pem" {
-  bucket = "${var.state_bucket}"
-  key    = "/secrets/kubelet/kubelet-key.pem"
-}
-
-data "ignition_file" "kubelet_key_pem" {
-  path       = "/etc/kubernetes/secrets/kubelet-key.pem"
-  mode       = 0600
-  filesystem = "root"
-
-  content {
-    content = "${data.aws_s3_bucket_object.kubelet_key_pem.body}"
-  }
 }
 
 data "ignition_systemd_unit" "apiserver" {

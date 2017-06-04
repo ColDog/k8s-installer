@@ -61,6 +61,14 @@ variable "desired" {
   default = 1
 }
 
+variable "ignition_files" {
+  type = "map"
+}
+
+output "user_data" {
+  value = "${data.ignition_config.master.rendered}"
+}
+
 output "api_server" {
   value = "${aws_route53_record.api_server.fqdn}"
 }

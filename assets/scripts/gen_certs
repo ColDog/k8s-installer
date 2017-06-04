@@ -1,5 +1,22 @@
 #!/usr/bin/env bash
 
+usage="gen_assets [kubernetes_api] [cluster_name] [bucket]"
+
+if [ "$1" == "" ]; then
+    echo "$usage"
+    exit 1
+fi
+
+if [ "$2" == "" ]; then
+    echo "$usage"
+    exit 1
+fi
+
+if [ "$3" == "" ]; then
+    echo "$usage"
+    exit 1
+fi
+
 kubernetes_api="$1"
 cluster_name="$2"
 bucket_path="$3"
@@ -75,6 +92,12 @@ gen_kubeconfig controller
 gen_kubeconfig admin
 gen_kubeconfig kubelet
 
-aws s3 cp --content-type=text/plain --recursive ${root}/certs/secrets/ s3://${bucket_path}/secrets/
-aws s3 cp --content-type=application/json --recursive ${root}/certs/resources/ s3://${bucket_path}/tlsconfig/
-rm -rf ${root}/certs/secrets/
+
+for file in $( find ${root}/certs/secrets ); do
+    if [[ -f ${file} ]]; then
+        echo -n "sha512-$( shasum -a 512 ${file} | awk '{print $1}' )" > ${file}.checksum.txt
+    fi
+done
+
+aws s3 cp --sse=AES256 --recursive ${root}/certs/secrets/ s3://${bucket_path}/secrets/
+aws s3 cp --sse=AES256 --content-type=application/json --recursive ${root}/certs/resources/ s3://${bucket_path}/tlsconfig/

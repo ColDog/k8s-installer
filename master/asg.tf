@@ -39,7 +39,7 @@ resource "aws_launch_configuration" "master" {
   security_groups      = ["${var.autoscaling_sgs}"]
 
   associate_public_ip_address = true
-  user_data                   = "${data.ignition_config.master_remote.rendered}"
+  user_data                   = "${data.ignition_config.master.rendered}"
 
   lifecycle {
     create_before_destroy = true

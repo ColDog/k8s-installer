@@ -2,6 +2,10 @@
 *.tfvars
 *.tfstate*
 *.pem
+*.csr
 .terraform
 *.kubeconfig
-binaries/*/
+*.checksum
+binaries/
+secrets/
+checksums/

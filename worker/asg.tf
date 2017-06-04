@@ -22,16 +22,8 @@ data "aws_ami" "coreos_ami" {
   }
 }
 
-resource "random_id" "launch_config" {
-  byte_length = 8
-
-  keepers = {
-    ignition_config = "${sha512(data.ignition_config.worker.rendered)}"
-  }
-}
-
 resource "aws_launch_configuration" "worker" {
-  name                 = "${var.cluster_name}_worker_lc_${random_id.launch_config.hex}"
+  name                 = "${var.cluster_name}_worker_lc_${sha1(data.ignition_config.worker.rendered)}"
   image_id             = "${data.aws_ami.coreos_ami.id}"
   instance_type        = "${var.instance_size}"
   key_name             = "${var.ssh_key}"
@@ -39,7 +31,7 @@ resource "aws_launch_configuration" "worker" {
   security_groups      = ["${var.autoscaling_sgs}"]
 
   associate_public_ip_address = true
-  user_data                   = "${data.ignition_config.worker_remote.rendered}"
+  user_data                   = "${data.ignition_config.worker.rendered}"
 
   lifecycle {
     create_before_destroy = true
