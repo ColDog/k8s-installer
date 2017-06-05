@@ -15,7 +15,7 @@ resource "aws_s3_bucket_object" "master_remote_config" {
 data "ignition_config" "master" {
   systemd = [
     "${data.ignition_systemd_unit.kubelet.id}",
-    "${data.ignition_systemd_unit.flannel.id}",
+    "${data.ignition_systemd_unit.flannel_enable.id}",
     "${data.ignition_systemd_unit.docker_opts.id}",
   ]
 
@@ -23,7 +23,6 @@ data "ignition_config" "master" {
     "${data.ignition_file.flannel_opts.id}",
     "${data.ignition_file.docker_cni_opts.id}",
     "${data.ignition_file.flannel_cni.id}",
-    "${data.ignition_systemd_unit.flannel.id}",
     "${data.ignition_file.kubelet_binary.id}",
     "${data.ignition_file.kubelet_kubeconfig.id}",
     "${data.ignition_file.kubelet_pem.id}",
@@ -56,7 +55,7 @@ resource "aws_s3_bucket_object" "worker_remote_config" {
 data "ignition_config" "worker" {
   systemd = [
     "${data.ignition_systemd_unit.kubelet.id}",
-    "${data.ignition_systemd_unit.flannel.id}",
+    "${data.ignition_systemd_unit.flannel_enable.id}",
     "${data.ignition_systemd_unit.docker_opts.id}",
   ]
 
@@ -64,7 +63,6 @@ data "ignition_config" "worker" {
     "${data.ignition_file.flannel_opts.id}",
     "${data.ignition_file.docker_cni_opts.id}",
     "${data.ignition_file.flannel_cni.id}",
-    "${data.ignition_systemd_unit.flannel.id}",
     "${data.ignition_file.kubelet_binary.id}",
     "${data.ignition_file.kubelet_kubeconfig.id}",
     "${data.ignition_file.kubelet_pem.id}",
@@ -72,18 +70,6 @@ data "ignition_config" "worker" {
     "${data.ignition_file.svcaccount_pem.id}",
     "${data.ignition_file.svcaccount_key_pem.id}",
   ]
-}
-
-data "ignition_file" "flannel_opts" {
-  filesystem = "root"
-  path       = "/etc/flannel/options.env"
-
-  content {
-    content = <<EOF
-FLANNELD_IFACE=$${COREOS_PRIVATE_IPV4}
-FLANNELD_ETCD_ENDPOINTS=${join(",", var.etcd_nodes)}
-EOF
-  }
 }
 
 data "ignition_file" "docker_cni_opts" {
@@ -115,7 +101,19 @@ EOF
   }
 }
 
-data "ignition_systemd_unit" "flannel" {
+data "ignition_file" "flannel_opts" {
+  filesystem = "root"
+  path       = "/etc/flannel/options.env"
+
+  content {
+    content = <<EOF
+FLANNELD_IFACE=$${COREOS_PRIVATE_IPV4}
+FLANNELD_ETCD_ENDPOINTS=${join(",", var.etcd_nodes)}
+EOF
+  }
+}
+
+data "ignition_systemd_unit" "flannel_enable" {
   name = "flanneld.service.d"
   enable = true
 

@@ -7,11 +7,11 @@ variable "state_bucket" {}
 variable "kubernetes_version" {}
 
 output "worker_config" {
-  value = "${data.ignition_config.worker_remote.rendered}"
+  value = "${data.ignition_config.worker.rendered}"
 }
 
 output "master_config" {
-  value = "${data.ignition_config.worker_remote.rendered}"
+  value = "${data.ignition_config.master.rendered}"
 }
 
 output "ami" {
