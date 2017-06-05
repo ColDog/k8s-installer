@@ -1,4 +1,3 @@
-# Architecture
+# Kubernetes Installer
 
-- ETCD Cluster
-- Worker Pool
+A for fun project to create terraform scripts that install Kubernetes.
