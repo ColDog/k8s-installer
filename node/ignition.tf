@@ -117,6 +117,7 @@ EOF
 
 data "ignition_systemd_unit" "flannel" {
   name = "flanneld.service.d"
+  enable = true
 
   dropin {
     name = "40-ExecStartPre-symlink.conf"
@@ -128,18 +129,9 @@ EOF
   }
 }
 
-data "ignition_systemd_unit" "flannel" {
-  name = "flanneld.service"
-  enable = true
-  dropin {
-    name = "50-network-config.conf"
-    content = <<EOF
-EOF
-  }
-}
-
 data "ignition_systemd_unit" "docker_opts" {
   name = "docker.service.d"
+  enable = true
 
   dropin {
     name = "40-flannel.conf"
