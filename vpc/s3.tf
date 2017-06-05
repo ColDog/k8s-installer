@@ -1,10 +1,10 @@
 resource "aws_vpc_endpoint" "s3_assoc" {
   service_name = "com.amazonaws.us-west-2.s3"
-  vpc_id       = "${var.vpc_id}"
+  vpc_id       = "${aws_vpc.main_vpc.id}"
 }
 
 data "aws_route_table" "main_vpc" {
-  vpc_id = "${var.vpc_id}"
+  vpc_id = "${aws_vpc.main_vpc.id}"
 }
 
 resource "aws_vpc_endpoint_route_table_association" "s3_assoc" {

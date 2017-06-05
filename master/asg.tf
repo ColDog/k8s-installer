@@ -1,40 +1,23 @@
-data "aws_ami" "coreos_ami" {
-  most_recent = true
-
-  filter {
-    name   = "name"
-    values = ["CoreOS-stable-*"]
-  }
-
-  filter {
-    name   = "architecture"
-    values = ["x86_64"]
-  }
-
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
-
-  filter {
-    name   = "owner-id"
-    values = ["595879546273"]
-  }
+module "node" {
+  source             = "../node"
+  kubernetes_version = "${var.kubernetes_version}"
+  state_bucket       = "${var.state_bucket}"
+  etcd_nodes         = "${var.etcd_nodes}"
 }
 
 resource "aws_launch_configuration" "master" {
   name                 = "${var.cluster_name}_master_lc.${uuid()}"
-  image_id             = "${data.aws_ami.coreos_ami.id}"
+  image_id             = "${module.node.ami}"
   instance_type        = "${var.instance_size}"
   key_name             = "${var.ssh_key}"
-  iam_instance_profile = "${var.iam_master_profile_id}"
+  iam_instance_profile = "${var.iam_profile}"
   security_groups      = ["${var.autoscaling_sgs}"]
 
   associate_public_ip_address = true
-  user_data                   = "${data.ignition_config.master.rendered}"
+  user_data                   = "${module.node.worker_config}"
 
   lifecycle {
-    ignore_changes = ["name"]
+    ignore_changes        = ["name"]
     create_before_destroy = true
   }
 }

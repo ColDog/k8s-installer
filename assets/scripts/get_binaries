@@ -17,10 +17,9 @@ bucket_path=$2
 
 mkdir -p binaries/${version}
 
-for binary in "kube-proxy" "kubelet"; do
+for binary in "kubelet"; do
     curl -o binaries/${version}/${binary} https://storage.googleapis.com/kubernetes-release/release/${version}/bin/linux/amd64/${binary}
     echo -n "sha512-$( shasum -a 512 binaries/${version}/${binary} | awk '{print $1}' )" > binaries/${version}/${binary}.checksum.txt
-#    gzip binaries/${version}/${binary}
 done
 
 aws s3 cp --recursive binaries/ s3://${bucket_path}/binaries/

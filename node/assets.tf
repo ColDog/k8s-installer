@@ -202,28 +202,12 @@ data "aws_s3_bucket_object" "kubelet_binary_checksum" {
 }
 
 data "ignition_file" "kubelet_binary" {
-  path       = "/var/lib/kubernetes/bin/kubelet"
+  path       = "/opt/bin/kubelet"
   mode       = 0700
   filesystem = "root"
 
   source {
     source       = "https://s3-${data.aws_region.current.name}.amazonaws.com/${var.state_bucket}/binaries/${var.kubernetes_version}/kubelet"
     verification = "${data.aws_s3_bucket_object.kubelet_binary_checksum.body}"
-  }
-}
-
-data "aws_s3_bucket_object" "kubeproxy_binary_checksum" {
-  bucket = "${var.state_bucket}"
-  key    = "binaries/${var.kubernetes_version}/kube-proxy.checksum.txt"
-}
-
-data "ignition_file" "kubeproxy_binary" {
-  path       = "/var/lib/kubernetes/bin/kube-proxy"
-  mode       = 0700
-  filesystem = "root"
-
-  source {
-    source       = "https://s3-${data.aws_region.current.name}.amazonaws.com/${var.state_bucket}/binaries/${var.kubernetes_version}/kube-proxy"
-    verification = "${data.aws_s3_bucket_object.kubeproxy_binary_checksum.body}"
   }
 }

@@ -4,13 +4,13 @@ variable "base_domain" {}
 
 variable "cluster_name" {}
 
-variable "api_server" {}
-
 variable "state_bucket" {}
 
-variable "cluster_domain" {}
+variable "kubernetes_version" {}
 
-variable "cluster_cidr" {}
+variable "etcd_nodes" {
+  type = "list"
+}
 
 variable "instance_size" {}
 
@@ -20,7 +20,7 @@ variable "autoscaling_sgs" {
   type = "list"
 }
 
-variable "iam_worker_profile_id" {}
+variable "iam_profile" {}
 
 variable "subnets" {
   type = "list"
@@ -36,12 +36,4 @@ variable "min" {
 
 variable "desired" {
   default = 1
-}
-
-variable "ignition_files" {
-  type = "map"
-}
-
-output "user_data" {
-  value = "${data.ignition_config.worker.rendered}"
 }

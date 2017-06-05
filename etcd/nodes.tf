@@ -40,7 +40,6 @@ resource "aws_instance" "etcd_node" {
     # avoids accidental deletion of nodes whenever a new CoreOS Release comes
     # out.
     ignore_changes = ["ami"]
-    prevent_destroy = true
   }
 
   tags {

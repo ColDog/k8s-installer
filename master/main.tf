@@ -4,17 +4,13 @@ variable "base_domain" {}
 
 variable "cluster_name" {}
 
-variable "hyperkube_image" {}
-
-variable "service_cluster_ip_range" {}
-
-variable "cluster_cidr" {}
+variable "kubernetes_version" {}
 
 variable "etcd_nodes" {
   type = "list"
 }
 
-variable "iam_master_profile_id" {}
+variable "iam_profile" {}
 
 variable "state_bucket" {
   type = "string"
@@ -46,14 +42,6 @@ variable "min" {
 
 variable "desired" {
   default = 1
-}
-
-variable "ignition_files" {
-  type = "map"
-}
-
-output "user_data" {
-  value = "${data.ignition_config.master.rendered}"
 }
 
 output "api_server" {

@@ -1,0 +1,19 @@
+variable "etcd_nodes" {
+  type = "list"
+}
+
+variable "state_bucket" {}
+
+variable "kubernetes_version" {}
+
+output "worker_config" {
+  value = "${data.ignition_config.worker_remote.rendered}"
+}
+
+output "master_config" {
+  value = "${data.ignition_config.worker_remote.rendered}"
+}
+
+output "ami" {
+  value = "${data.aws_ami.coreos_ami.id}"
+}

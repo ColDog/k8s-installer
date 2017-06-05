@@ -4,6 +4,8 @@ variable "cidr_blocks" {
   type = "list"
 }
 
+variable "state_bucket" {}
+
 output "subnet_ids" {
   value = ["${aws_subnet.main_subnets.*.id}"]
 }
