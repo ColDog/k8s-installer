@@ -18,3 +18,7 @@ module "cluster" {
   state_bucket = "state.default.coldog.xyz"
   cluster_name = "default"
 }
+
+output "api_server" {
+  value = "${module.cluster.api_server}"
+}

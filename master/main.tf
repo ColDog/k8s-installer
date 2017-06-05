@@ -6,7 +6,9 @@ variable "cluster_name" {}
 
 variable "hyperkube_image" {}
 
-variable "cluster_ip_range" {}
+variable "service_cluster_ip_range" {}
+
+variable "cluster_cidr" {}
 
 variable "etcd_nodes" {
   type = "list"

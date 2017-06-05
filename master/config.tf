@@ -38,7 +38,6 @@ ExecStart=/usr/bin/docker run --name=kubernetes.apiserver -v /etc/kubernetes:/et
   --secure-port=443 \
   --insecure-port=80 \
   --insecure-bind-address=127.0.0.1 \
-  --service-cluster-ip-range=${var.cluster_ip_range} \
   --etcd-servers=${join(",", var.etcd_nodes)} \
   --client-ca-file=/etc/kubernetes/secrets/ca.pem \
   --service-account-key-file=/etc/kubernetes/secrets/svcaccount-key.pem \
@@ -47,7 +46,8 @@ ExecStart=/usr/bin/docker run --name=kubernetes.apiserver -v /etc/kubernetes:/et
   --kubelet-client-key=/etc/kubernetes/secrets/kubelet-key.pem \
   --tls-ca-file=/etc/kubernetes/secrets/ca.pem \
   --tls-cert-file=/etc/kubernetes/secrets/apiserver.pem \
-  --tls-private-key-file=/etc/kubernetes/secrets/apiserver-key.pem
+  --tls-private-key-file=/etc/kubernetes/secrets/apiserver-key.pem \
+  --service-cluster-ip-range=${var.service_cluster_ip_range}
 
 [Install]
 WantedBy=multi-user.target
@@ -77,7 +77,10 @@ ExecStart=/usr/bin/docker run --name=kubernetes.controllermanager -v /etc/kubern
   --leader-elect=true \
   --master=http://127.0.0.1:80 \
   --root-ca-file=/etc/kubernetes/secrets/ca.pem \
-  --service-account-private-key-file=/etc/kubernetes/secrets/svcaccount-key.pem
+  --service-account-private-key-file=/etc/kubernetes/secrets/svcaccount-key.pem \
+  --allocate-node-cidrs=true \
+  --cluster-cidr=${var.cluster_cidr} \
+  --service-cluster-ip-range=${var.service_cluster_ip_range}
 
 [Install]
 WantedBy=multi-user.target

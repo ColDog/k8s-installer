@@ -26,7 +26,7 @@ Requires=docker.service
 
 [Service]
 ExecStart=/var/lib/kubernetes/bin/kubelet \
-  --api-servers=${var.api_server} \
+  --api-servers=https://${var.api_server} \
   --cluster-domain=${var.cluster_domain} \
   --allow-privileged=true \
   --container-runtime=docker \

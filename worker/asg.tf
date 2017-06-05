@@ -23,7 +23,7 @@ data "aws_ami" "coreos_ami" {
 }
 
 resource "aws_launch_configuration" "worker" {
-  name                 = "${var.cluster_name}_worker_lc_${sha1(data.ignition_config.worker.rendered)}"
+  name                 = "${var.cluster_name}_worker_lc.${uuid()}"
   image_id             = "${data.aws_ami.coreos_ami.id}"
   instance_type        = "${var.instance_size}"
   key_name             = "${var.ssh_key}"
@@ -34,6 +34,7 @@ resource "aws_launch_configuration" "worker" {
   user_data                   = "${data.ignition_config.worker.rendered}"
 
   lifecycle {
+    ignore_changes = ["name"]
     create_before_destroy = true
   }
 }

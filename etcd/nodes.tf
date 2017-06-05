@@ -27,6 +27,7 @@ resource "aws_instance" "etcd_node" {
   ami   = "${data.aws_ami.coreos_ami.image_id}"
 
   instance_type           = "${var.instance_type}"
+  subnet_id               = "${var.subnets[min(count.index, length(var.subnets)-1)]}"
   key_name                = "${var.ssh_key}"
   user_data               = "${data.ignition_config.etcd.*.rendered[count.index]}"
   vpc_security_group_ids  = ["${var.security_groups}"]
