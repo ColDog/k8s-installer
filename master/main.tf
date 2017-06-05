@@ -1,23 +1,12 @@
-variable "dns_zone_id" {
-  type = "string"
-}
+variable "dns_zone_id" {}
 
-variable "base_domain" {
-  type = "string"
-}
+variable "base_domain" {}
 
-variable "cluster_name" {
-  type    = "string"
-  default = "default"
-}
+variable "cluster_name" {}
 
-variable "hyperkube_image" {
-  default = "quay.io/coreos/hyperkube:v1.6.4_coreos.0"
-}
+variable "hyperkube_image" {}
 
-variable "cluster_ip_range" {
-  default = "10.0.0.0/32"
-}
+variable "cluster_ip_range" {}
 
 variable "etcd_nodes" {
   type = "list"
@@ -29,13 +18,9 @@ variable "state_bucket" {
   type = "string"
 }
 
-variable "instance_size" {
-  default = "t2.small"
-}
+variable "instance_size" {}
 
-variable "ssh_key" {
-  default = "default_key"
-}
+variable "ssh_key" {}
 
 variable "autoscaling_sgs" {
   type = "list"

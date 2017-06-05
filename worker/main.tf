@@ -1,37 +1,20 @@
-variable "dns_zone_id" {
-  type = "string"
-}
+variable "dns_zone_id" {}
 
-variable "base_domain" {
-  type = "string"
-}
+variable "base_domain" {}
 
-variable "cluster_name" {
-  type    = "string"
-  default = "default"
-}
+variable "cluster_name" {}
 
 variable "api_server" {}
+
+variable "state_bucket" {}
 
 variable "cluster_domain" {}
 
 variable "cluster_cidr" {}
 
-variable "kubernetes_version" {
-  default = "v1-6-4"
-}
+variable "instance_size" {}
 
-variable "state_bucket" {
-  type = "string"
-}
-
-variable "instance_size" {
-  default = "t2.small"
-}
-
-variable "ssh_key" {
-  default = "default_key"
-}
+variable "ssh_key" {}
 
 variable "autoscaling_sgs" {
   type = "list"

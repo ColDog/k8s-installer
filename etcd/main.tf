@@ -1,30 +1,12 @@
-variable "dns_zone_id" {
-  type = "string"
-}
+variable "dns_zone_id" {}
 
-variable "base_domain" {
-  type = "string"
-}
+variable "base_domain" {}
 
-variable "cluster_name" {
-  type    = "string"
-  default = "default"
-}
+variable "cluster_name" {}
 
-variable "cl_channel" {
-  type    = "string"
-  default = "stable"
-}
+variable "instance_type" {}
 
-variable "instance_type" {
-  type    = "string"
-  default = "t2.micro"
-}
-
-variable "ssh_key_name" {
-  type    = "string"
-  default = "default_key"
-}
+variable "ssh_key" {}
 
 variable "subnets" {
   type = "list"
@@ -35,12 +17,10 @@ variable "security_groups" {
 }
 
 variable "container_image" {
-  type    = "string"
   default = "quay.io/coreos/etcd:latest"
 }
 
 variable "instances" {
-  type    = "string"
   default = 3
 }
 

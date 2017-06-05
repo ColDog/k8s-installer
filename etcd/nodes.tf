@@ -3,7 +3,7 @@ data "aws_ami" "coreos_ami" {
 
   filter {
     name   = "name"
-    values = ["CoreOS-${var.cl_channel}-*"]
+    values = ["CoreOS-stable-*"]
   }
 
   filter {
@@ -27,8 +27,7 @@ resource "aws_instance" "etcd_node" {
   ami   = "${data.aws_ami.coreos_ami.image_id}"
 
   instance_type           = "${var.instance_type}"
-  subnet_id               = "${var.subnets[count.index]}"
-  key_name                = "${var.ssh_key_name}"
+  key_name                = "${var.ssh_key}"
   user_data               = "${data.ignition_config.etcd.*.rendered[count.index]}"
   vpc_security_group_ids  = ["${var.security_groups}"]
   disable_api_termination = true
@@ -40,7 +39,6 @@ resource "aws_instance" "etcd_node" {
     # avoids accidental deletion of nodes whenever a new CoreOS Release comes
     # out.
     ignore_changes = ["ami"]
-
     prevent_destroy = true
   }
 

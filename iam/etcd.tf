@@ -38,6 +38,18 @@ resource "aws_iam_role_policy" "etcd_policy" {
       ],
       "Resource": "arn:aws:s3:::*",
       "Effect": "Allow"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "logs:CreateLogStream",
+        "logs:PutLogEvents",
+        "logs:DescribeLogStreams"
+      ],
+      "Resource": [
+        "arn:aws:logs:*:*:log-group:*",
+        "arn:aws:logs:*:*:log-group:*:log-stream:*"
+      ]
     }
   ]
 }

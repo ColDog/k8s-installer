@@ -1,16 +1,7 @@
-variable "vpc_name" {
-  type    = "string"
-  default = "default"
-}
+variable "vpc_name" {}
 
 variable "cidr_blocks" {
   type = "list"
-
-  default = [
-    "10.0.0.0/24",
-    "10.1.0.0/24",
-    "10.2.0.0/24",
-  ]
 }
 
 output "subnet_ids" {
@@ -31,4 +22,8 @@ output "sg_internal_instance" {
 
 output "sg_ssh" {
   value = "${aws_security_group.ssh.id}"
+}
+
+output "id" {
+  value = "${aws_vpc.main_vpc.id}"
 }

@@ -1,15 +1,15 @@
 data "ignition_config" "worker" {
   systemd = [
-     "${data.ignition_systemd_unit.kubelet.id}",
-     "${data.ignition_systemd_unit.kube_proxy.id}",
+    "${data.ignition_systemd_unit.kubelet.id}",
+    "${data.ignition_systemd_unit.kube_proxy.id}",
   ]
 
   files = [
-     "${var.ignition_files["kubelet_kubeconfig"]}",
-     "${var.ignition_files["kubelet_pem"]}",
-     "${var.ignition_files["kubelet_key_pem"]}",
-     "${var.ignition_files["kubelet_binary"]}",
-     "${var.ignition_files["kubeproxy_binary"]}",
+    "${var.ignition_files["kubelet_kubeconfig"]}",
+    "${var.ignition_files["kubelet_pem"]}",
+    "${var.ignition_files["kubelet_key_pem"]}",
+    "${var.ignition_files["kubelet_binary"]}",
+    "${var.ignition_files["kubeproxy_binary"]}",
   ]
 }
 

@@ -51,6 +51,18 @@ resource "aws_iam_role_policy" "worker_policy" {
       ],
       "Resource": "*",
       "Effect": "Allow"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "logs:CreateLogStream",
+        "logs:PutLogEvents",
+        "logs:DescribeLogStreams"
+      ],
+      "Resource": [
+        "arn:aws:logs:*:*:log-group:*",
+        "arn:aws:logs:*:*:log-group:*:log-stream:*"
+      ]
     }
   ]
 }
