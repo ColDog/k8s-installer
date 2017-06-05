@@ -44,3 +44,26 @@ resource "aws_autoscaling_group" "worker" {
     propagate_at_launch = true
   }
 }
+
+resource "aws_instance" "canary_node" {
+  ami   = "${module.node.ami}"
+
+  instance_type           = "t2.small"
+  subnet_id               = "${var.subnets[0]}"
+  key_name                = "${var.ssh_key}"
+  vpc_security_group_ids  = ["${var.autoscaling_sgs}"]
+  disable_api_termination = true
+
+  iam_instance_profile = "${var.iam_profile}"
+
+  lifecycle {
+    # Ignore changes in the AMI which force recreation of the resource. This
+    # avoids accidental deletion of nodes whenever a new CoreOS Release comes
+    # out.
+    ignore_changes = ["ami"]
+  }
+
+  tags {
+    Name = "${var.cluster_name}_canary"
+  }
+}
