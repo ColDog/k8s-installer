@@ -3,6 +3,7 @@ module "node" {
   kubernetes_version = "${var.kubernetes_version}"
   state_bucket       = "${var.state_bucket}"
   etcd_nodes         = "${var.etcd_nodes}"
+  cluster_name       = "${var.cluster_name}"
 }
 
 resource "aws_launch_configuration" "master" {
@@ -14,7 +15,7 @@ resource "aws_launch_configuration" "master" {
   security_groups      = ["${var.autoscaling_sgs}"]
 
   associate_public_ip_address = true
-  user_data                   = "${module.node.worker_config}"
+  user_data                   = "${module.node.master_config}"
 
   lifecycle {
     ignore_changes        = ["name"]

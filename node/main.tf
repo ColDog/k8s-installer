@@ -6,6 +6,8 @@ variable "state_bucket" {}
 
 variable "kubernetes_version" {}
 
+variable "cluster_name" {}
+
 output "worker_config" {
   value = "${data.ignition_config.worker.rendered}"
 }

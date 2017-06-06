@@ -3,6 +3,7 @@ module "node" {
   kubernetes_version = "${var.kubernetes_version}"
   state_bucket       = "${var.state_bucket}"
   etcd_nodes         = "${var.etcd_nodes}"
+  cluster_name       = "${var.cluster_name}"
 }
 
 resource "aws_launch_configuration" "worker" {
@@ -42,28 +43,5 @@ resource "aws_autoscaling_group" "worker" {
     key                 = "Name"
     value               = "${var.cluster_name}_worker"
     propagate_at_launch = true
-  }
-}
-
-resource "aws_instance" "canary_node" {
-  ami   = "${module.node.ami}"
-
-  instance_type           = "t2.small"
-  subnet_id               = "${var.subnets[0]}"
-  key_name                = "${var.ssh_key}"
-  vpc_security_group_ids  = ["${var.autoscaling_sgs}"]
-  disable_api_termination = true
-
-  iam_instance_profile = "${var.iam_profile}"
-
-  lifecycle {
-    # Ignore changes in the AMI which force recreation of the resource. This
-    # avoids accidental deletion of nodes whenever a new CoreOS Release comes
-    # out.
-    ignore_changes = ["ami"]
-  }
-
-  tags {
-    Name = "${var.cluster_name}_canary"
   }
 }
