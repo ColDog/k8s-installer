@@ -37,3 +37,13 @@ variable "min" {
 variable "desired" {
   default = 1
 }
+
+variable "api_server" {}
+
+variable "node_network" {}
+
+variable "pod_network" {}
+
+variable "service_ip_range" {}
+
+variable "dns_service_ip" {}

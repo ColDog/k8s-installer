@@ -4,6 +4,12 @@ module "node" {
   state_bucket       = "${var.state_bucket}"
   etcd_nodes         = "${var.etcd_nodes}"
   cluster_name       = "${var.cluster_name}"
+  api_server         = "${aws_route53_record.api_server.fqdn}"
+
+  dns_service_ip   = "${var.dns_service_ip}"
+  node_network     = "${var.node_network}"
+  service_ip_range = "${var.service_ip_range}"
+  pod_network      = "${var.pod_network}"
 }
 
 resource "aws_launch_configuration" "master" {

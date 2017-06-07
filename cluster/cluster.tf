@@ -57,6 +57,11 @@ module "master" {
 
   etcd_nodes         = ["${module.etcd.etcd_nodes}"]
   kubernetes_version = "${var.kubernetes_version}"
+
+  dns_service_ip   = "${var.dns_service_ip}"
+  node_network     = "${var.node_network}"
+  service_ip_range = "${var.service_ip_range}"
+  pod_network      = "${var.pod_network}"
 }
 
 module "worker" {
@@ -80,4 +85,10 @@ module "worker" {
 
   etcd_nodes         = ["${module.etcd.etcd_nodes}"]
   kubernetes_version = "${var.kubernetes_version}"
+
+  api_server       = "${module.master.api_server}"
+  dns_service_ip   = "${var.dns_service_ip}"
+  node_network     = "${var.node_network}"
+  service_ip_range = "${var.service_ip_range}"
+  pod_network      = "${var.pod_network}"
 }

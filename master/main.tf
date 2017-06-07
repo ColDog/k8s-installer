@@ -44,6 +44,14 @@ variable "desired" {
   default = 1
 }
 
+variable "node_network" {}
+
+variable "pod_network" {}
+
+variable "service_ip_range" {}
+
+variable "dns_service_ip" {}
+
 output "api_server" {
   value = "${aws_route53_record.api_server.fqdn}"
 }

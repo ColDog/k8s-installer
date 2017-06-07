@@ -8,6 +8,16 @@ variable "kubernetes_version" {}
 
 variable "cluster_name" {}
 
+variable "api_server" {}
+
+variable "node_network" {}
+
+variable "pod_network" {}
+
+variable "service_ip_range" {}
+
+variable "dns_service_ip" {}
+
 output "worker_config" {
   value = "${data.ignition_config.worker.rendered}"
 }
