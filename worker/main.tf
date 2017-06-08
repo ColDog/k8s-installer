@@ -8,6 +8,10 @@ variable "state_bucket" {}
 
 variable "kubernetes_version" {}
 
+variable "cni_version" {}
+
+variable "flanneld_version" {}
+
 variable "etcd_nodes" {
   type = "list"
 }

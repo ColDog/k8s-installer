@@ -56,7 +56,10 @@ module "master" {
   ssh_key       = "${var.ssh_key}"
 
   etcd_nodes         = ["${module.etcd.etcd_nodes}"]
+
   kubernetes_version = "${var.kubernetes_version}"
+  cni_version = "${var.cni_version}"
+  flanneld_version = "${var.flanneld_version}"
 
   dns_service_ip   = "${var.dns_service_ip}"
   node_network     = "${var.node_network}"
@@ -84,7 +87,10 @@ module "worker" {
   ssh_key       = "${var.ssh_key}"
 
   etcd_nodes         = ["${module.etcd.etcd_nodes}"]
+
   kubernetes_version = "${var.kubernetes_version}"
+  cni_version = "${var.cni_version}"
+  flanneld_version = "${var.flanneld_version}"
 
   api_server       = "${module.master.api_server}"
   dns_service_ip   = "${var.dns_service_ip}"

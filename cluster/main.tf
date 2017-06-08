@@ -18,6 +18,14 @@ variable "kubernetes_version" {
   default = "v1.6.4"
 }
 
+variable "flanneld_version" {
+  default = "v0.7.1"
+}
+
+variable "cni_version" {
+  default = "v0.5.2"
+}
+
 variable "hyperkube_image" {
   default = "quay.io/coreos/hyperkube:v1.6.4_coreos.0"
 }

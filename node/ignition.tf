@@ -13,10 +13,10 @@ data "ignition_config" "master" {
 
   files = [
     // Installers
-    "${data.ignition_file.cni_installer}",
-    "${data.ignition_file.flanneld_installer}",
-    "${data.ignition_file.kubeproxy_installer}",
-    "${data.ignition_file.kubelet_installer}",
+    "${data.ignition_file.cni_installer.id}",
+    "${data.ignition_file.flanneld_installer.id}",
+    "${data.ignition_file.kubeproxy_installer.id}",
+    "${data.ignition_file.kubelet_installer.id}",
 
     // Secrets / SSL
     "${data.ignition_file.kubelet_kubeconfig.id}",
@@ -51,10 +51,10 @@ data "ignition_config" "worker" {
     "${data.ignition_file.cni_opts.id}",
 
     // Installers
-    "${data.ignition_file.cni_installer}",
-    "${data.ignition_file.flanneld_installer}",
-    "${data.ignition_file.kubeproxy_installer}",
-    "${data.ignition_file.kubelet_installer}",
+    "${data.ignition_file.cni_installer.id}",
+    "${data.ignition_file.flanneld_installer.id}",
+    "${data.ignition_file.kubeproxy_installer.id}",
+    "${data.ignition_file.kubelet_installer.id}",
 
     // Secrets / SSL
     "${data.ignition_file.kubelet_kubeconfig.id}",
@@ -68,7 +68,9 @@ data "ignition_config" "worker" {
 data "ignition_file" "cni_opts" {
   filesystem = "root"
   path = "/etc/cni/net.d/10-flannel.conf"
-  content = <<EOF
+
+  content {
+    content = <<EOF
 {
   "name": "podnet",
   "type": "flannel",
@@ -77,6 +79,7 @@ data "ignition_file" "cni_opts" {
   }
 }
 EOF
+  }
 }
 
 data "ignition_systemd_unit" "metadata" {
@@ -164,7 +167,7 @@ EnvironmentFile=/run/metadata/coreos
 ExecStartPre=/opt/bin/flanneld-installer
 ExecStart=/opt/bin/flanneld \
   --iface=$${COREOS_EC2_IPV4_LOCAL} \
-  --etcd-endpoints=${var.etcd_nodes}
+  --etcd-endpoints=${join(",", var.etcd_nodes)}
 Restart=on-failure
 RestartSec=5
 Restart=always

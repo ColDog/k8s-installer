@@ -1,6 +1,5 @@
 module "node" {
   source             = "../node"
-  kubernetes_version = "${var.kubernetes_version}"
   state_bucket       = "${var.state_bucket}"
   etcd_nodes         = "${var.etcd_nodes}"
   cluster_name       = "${var.cluster_name}"
@@ -10,6 +9,10 @@ module "node" {
   node_network     = "${var.node_network}"
   service_ip_range = "${var.service_ip_range}"
   pod_network      = "${var.pod_network}"
+
+  kubernetes_version = "${var.kubernetes_version}"
+  cni_version = "${var.cni_version}"
+  flanneld_version = "${var.flanneld_version}"
 }
 
 resource "aws_launch_configuration" "master" {
