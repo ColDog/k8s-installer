@@ -1,15 +1,24 @@
 data "ignition_config" "master" {
   systemd = [
+    // System
     "${data.ignition_systemd_unit.metadata.id}",
     "${data.ignition_systemd_unit.docker.id}",
     "${data.ignition_systemd_unit.logger.id}",
+
+    // Kubernetes
     "${data.ignition_systemd_unit.controllermanager.id}",
     "${data.ignition_systemd_unit.scheduler.id}",
     "${data.ignition_systemd_unit.apiserver.id}",
   ]
 
   files = [
-    "${data.ignition_file.kubelet_binary.id}",
+    // Installers
+    "${data.ignition_file.cni_installer}",
+    "${data.ignition_file.flanneld_installer}",
+    "${data.ignition_file.kubeproxy_installer}",
+    "${data.ignition_file.kubelet_installer}",
+
+    // Secrets / SSL
     "${data.ignition_file.kubelet_kubeconfig.id}",
     "${data.ignition_file.kubelet_pem.id}",
     "${data.ignition_file.kubelet_key_pem.id}",
@@ -26,20 +35,48 @@ data "ignition_config" "master" {
 
 data "ignition_config" "worker" {
   systemd = [
+    // System
     "${data.ignition_systemd_unit.metadata.id}",
     "${data.ignition_systemd_unit.docker.id}",
-    "${data.ignition_systemd_unit.kubelet.id}",
     "${data.ignition_systemd_unit.logger.id}",
+
+    // Kubernetes
+    "${data.ignition_systemd_unit.kubelet.id}",
+    "${data.ignition_systemd_unit.flanneld.id}",
+    "${data.ignition_systemd_unit.kubeproxy.id}",
   ]
 
   files = [
-    "${data.ignition_file.kubelet_binary.id}",
+    // Option files
+    "${data.ignition_file.cni_opts.id}",
+
+    // Installers
+    "${data.ignition_file.cni_installer}",
+    "${data.ignition_file.flanneld_installer}",
+    "${data.ignition_file.kubeproxy_installer}",
+    "${data.ignition_file.kubelet_installer}",
+
+    // Secrets / SSL
     "${data.ignition_file.kubelet_kubeconfig.id}",
     "${data.ignition_file.kubelet_pem.id}",
     "${data.ignition_file.kubelet_key_pem.id}",
     "${data.ignition_file.svcaccount_pem.id}",
     "${data.ignition_file.svcaccount_key_pem.id}",
   ]
+}
+
+data "ignition_file" "cni_opts" {
+  filesystem = "root"
+  path = "/etc/cni/net.d/10-flannel.conf"
+  content = <<EOF
+{
+  "name": "podnet",
+  "type": "flannel",
+  "delegate": {
+    "isDefaultGateway": true
+  }
+}
+EOF
 }
 
 data "ignition_systemd_unit" "metadata" {
@@ -62,7 +99,10 @@ Description=KubernetesKubelet
 Documentation=https://github.com/GoogleCloudPlatform/kubernetes
 
 [Service]
+ExecStartPre=/opt/bin/kubelet-installer
+ExecStartPre=/opt/bin/cni-installer
 ExecStart=/opt/bin/kubelet \
+  --api-servers=https://${var.api_server} \
   --cluster-domain=cluster.local \
   --allow-privileged=true \
   --register-schedulable=false \
@@ -73,6 +113,58 @@ ExecStart=/opt/bin/kubelet \
   --register-node=true \
   --tls-cert-file=/etc/kubernetes/secrets/kubelet.pem \
   --tls-private-key-file=/etc/kubernetes/secrets/kubelet-key.pem
+Restart=on-failure
+RestartSec=5
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+EOF
+}
+
+data "ignition_systemd_unit" "kubeproxy" {
+  name   = "kubeproxy.service"
+  enable = true
+
+  content = <<EOF
+[Unit]
+Description=KubernetesKubeProxy
+Documentation=https://github.com/GoogleCloudPlatform/kubernetes
+
+[Service]
+ExecStartPre=/opt/bin/kubeproxy-installer
+ExecStart=/opt/bin/kube-proxy \
+  --cluster-cidr=${var.pod_network} \
+  --masquerade-all=true \
+  --kubeconfig=/etc/kubernetes/secrets/kubelet.kubeconfig \
+  --proxy-mode=iptables \
+  --v=2
+Restart=on-failure
+RestartSec=5
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+EOF
+}
+
+data "ignition_systemd_unit" "flanneld" {
+  name = "flannel.service"
+  enable = true
+
+  content = <<EOF
+[Unit]
+Description=FlannelDaemon
+Documentation=https://github.com/coreos/flannel
+Requires=coreos-metadata.service
+After=coreos-metadata.service
+
+[Service]
+EnvironmentFile=/run/metadata/coreos
+ExecStartPre=/opt/bin/flanneld-installer
+ExecStart=/opt/bin/flanneld \
+  --iface=$${COREOS_EC2_IPV4_LOCAL} \
+  --etcd-endpoints=${var.etcd_nodes}
 Restart=on-failure
 RestartSec=5
 Restart=always
@@ -120,12 +212,12 @@ ExecStartPre=-/usr/bin/docker stop apiserver.service
 ExecStartPre=-/usr/bin/docker rm apiserver.service
 ExecStart=/usr/bin/docker run --name=apiserver.service \
   -p 443:443 \
+  -p 127.0.0.1:80:80 \
   -v /etc/kubernetes/secrets:/etc/kubernetes/secrets \
   quay.io/coreos/hyperkube:${var.kubernetes_version}_coreos.0 \
   /hyperkube \
   apiserver \
   --v=1 \
-  --admission-control=NamespaceLifecycle,LimitRanger,ServiceAccount,DefaultStorageClass,ResourceQuota \
   --advertise-address=0.0.0.0 \
   --bind-address=0.0.0.0 \
   --secure-port=443 \
@@ -155,7 +247,7 @@ data "ignition_systemd_unit" "controllermanager" {
 
   content = <<EOF
 [Unit]
-Description=KubernetesApiServer
+Description=KubernetesControllerManager
 Documentation=https://github.com/GoogleCloudPlatform/kubernetes
 
 [Service]

@@ -6,6 +6,10 @@ variable "state_bucket" {}
 
 variable "kubernetes_version" {}
 
+variable "flanneld_version" {}
+
+variable "cni_version" {}
+
 variable "cluster_name" {}
 
 variable "api_server" {}

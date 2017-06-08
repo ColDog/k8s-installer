@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+
+declare -a kube_versions=("v1.6.4")
+declare -a flanneld_versions=("v0.7.1")
+declare -a cni_versions=("v0.5.2")
+
+bucket="k8s.dist.coldog.xyz"
+
+mkdir -p public/dist
+cd public/dist
+
+set -e
+
+function create_checksum() {
+    target=${1}
+    echo -n "sha512-$( shasum -a 512 ${target} | awk '{print $1}' )" > ${target}.sha512
+}
+
+function create_dist() {
+    name=${1}
+    url=${2}
+
+    if [ ! -f ${name} ]; then
+        curl -L -o "$name" "$url"
+
+        if [[ ${name: -3} != "tgz" ]]; then
+            chmod +x ${name}
+            tar -cvzf ${name}.tgz ${name}
+        else
+            name=${name%%.tgz}
+        fi
+        create_checksum ${name}.tgz
+
+        aws s3 cp ${name}.tgz s3://${bucket}/
+        aws s3 cp --content-type=text/plain ${name}.tgz.sha512 s3://${bucket}/
+    fi
+}
+
+for version in "${kube_versions[@]}"; do
+    for name in "kubelet" "kube-proxy"; do
+        create_dist ${name}-amd64-${version} https://storage.googleapis.com/kubernetes-release/release/${version}/bin/linux/amd64/${name}
+    done
+done
+
+for version in "${flanneld_versions[@]}"; do
+    create_dist flanneld-amd64-${version} https://github.com/coreos/flannel/releases/download/${version}/flanneld-amd64
+done
+
+for version in "${cni_versions[@]}"; do
+    create_dist cni-amd64-${version}.tgz https://github.com/containernetworking/cni/releases/download/${version}/cni-amd64-${version}.tgz
+done

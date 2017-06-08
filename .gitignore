@@ -5,7 +5,6 @@
 *.csr
 .terraform
 *.kubeconfig
-*.checksum
-binaries/
+
 secrets/
-checksums/
+dist/
