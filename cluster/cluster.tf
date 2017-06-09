@@ -2,7 +2,7 @@ module "vpc" {
   source = "../vpc"
 
   vpc_name     = "${var.vpc_name}"
-  cidr_blocks  = "${var.vpc_cidr_blocks}"
+  cidr = "${var.node_network}"
   state_bucket = "${var.state_bucket}"
 }
 

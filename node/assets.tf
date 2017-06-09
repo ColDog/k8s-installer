@@ -196,6 +196,8 @@ data "ignition_file" "controller_key_pem" {
 // Binaries
 // ====
 
+// todo: allow pre-baking an image with the installed binaries.
+
 variable "bin_host" {
   default = "https://s3-us-west-2.amazonaws.com/k8s.dist.coldog.xyz"
 }
@@ -243,6 +245,10 @@ data "ignition_file" "flanneld_installer" {
 /usr/bin/curl -L -o /opt/downloads/flanneld.tgz '${var.bin_host}/flanneld-amd64-${var.flanneld_version}.tgz'
 /usr/bin/tar -xvf /opt/downloads/flanneld.tgz -C /opt/bin/
 /usr/bin/mv /opt/bin/flanneld-amd64-${var.flanneld_version} /opt/bin/flanneld
+
+/usr/bin/etcdctl \
+  --endpoints=${join(",", var.etcd_nodes)} \
+  set /flanneld/${var.cluster_name}/config '{"Network": "${var.pod_network}"}'
 EOF
   }
 }

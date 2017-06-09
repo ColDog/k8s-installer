@@ -1,7 +1,7 @@
 variable "vpc_name" {}
 
-variable "cidr_blocks" {
-  type = "list"
+variable "cidr" {
+  default = "10.0.0.0/16"
 }
 
 variable "state_bucket" {}

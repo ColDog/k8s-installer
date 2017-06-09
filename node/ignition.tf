@@ -3,7 +3,7 @@ data "ignition_config" "master" {
     // System
     "${data.ignition_systemd_unit.metadata.id}",
     "${data.ignition_systemd_unit.docker.id}",
-    "${data.ignition_systemd_unit.logger.id}",
+//    "${data.ignition_systemd_unit.logger.id}",
 
     // Kubernetes
     "${data.ignition_systemd_unit.controllermanager.id}",
@@ -38,7 +38,7 @@ data "ignition_config" "worker" {
     // System
     "${data.ignition_systemd_unit.metadata.id}",
     "${data.ignition_systemd_unit.docker.id}",
-    "${data.ignition_systemd_unit.logger.id}",
+//    "${data.ignition_systemd_unit.logger.id}",
 
     // Kubernetes
     "${data.ignition_systemd_unit.kubelet.id}",
@@ -167,7 +167,8 @@ EnvironmentFile=/run/metadata/coreos
 ExecStartPre=/opt/bin/flanneld-installer
 ExecStart=/opt/bin/flanneld \
   --iface=$${COREOS_EC2_IPV4_LOCAL} \
-  --etcd-endpoints=${join(",", var.etcd_nodes)}
+  --etcd-endpoints=${join(",", var.etcd_nodes)} \
+  --etcd-prefix=/flanneld/${var.cluster_name}
 Restart=on-failure
 RestartSec=5
 Restart=always
@@ -190,7 +191,7 @@ Requires=docker.service
 ExecStartPre=-/usr/bin/docker stop logger.service
 ExecStartPre=-/usr/bin/docker rm logger.service
 ExecStart=/usr/bin/bash \
-  -c '/usr/bin/journalctl -o short-iso -f | /usr/bin/docker run -i --name=logger.service coldog/awslogger -stream=$(hostname) -group=${var.cluster_name} -region=us-west-2'
+  -c '/usr/bin/journalctl -o short-iso -f | /usr/bin/docker run -i --name=logger.service coldog/awslogger -stream=$(hostname) -group=${var.cluster_name}'
 ExecStop=/usr/bin/docker stop logger.service
 Restart=on-failure
 RestartSec=5
