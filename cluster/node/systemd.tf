@@ -1,73 +1,6 @@
-data "ignition_config" "master" {
-  systemd = [
-    // System
-    "${data.ignition_systemd_unit.metadata.id}",
-    "${data.ignition_systemd_unit.docker.id}",
-//    "${data.ignition_systemd_unit.logger.id}",
-
-    // Kubernetes
-    "${data.ignition_systemd_unit.controllermanager.id}",
-    "${data.ignition_systemd_unit.scheduler.id}",
-    "${data.ignition_systemd_unit.apiserver.id}",
-  ]
-
-  files = [
-    // Installers
-    "${data.ignition_file.cni_installer.id}",
-    "${data.ignition_file.flanneld_installer.id}",
-    "${data.ignition_file.kubeproxy_installer.id}",
-    "${data.ignition_file.kubelet_installer.id}",
-
-    // Secrets / SSL
-    "${data.ignition_file.kubelet_kubeconfig.id}",
-    "${data.ignition_file.kubelet_pem.id}",
-    "${data.ignition_file.kubelet_key_pem.id}",
-    "${data.ignition_file.svcaccount_pem.id}",
-    "${data.ignition_file.svcaccount_key_pem.id}",
-    "${data.ignition_file.ca_pem.id}",
-    "${data.ignition_file.apiserver_pem.id}",
-    "${data.ignition_file.apiserver_key_pem.id}",
-    "${data.ignition_file.controller_kubeconfig.id}",
-    "${data.ignition_file.controller_pem.id}",
-    "${data.ignition_file.controller_key_pem.id}",
-  ]
-}
-
-data "ignition_config" "worker" {
-  systemd = [
-    // System
-    "${data.ignition_systemd_unit.metadata.id}",
-    "${data.ignition_systemd_unit.docker.id}",
-//    "${data.ignition_systemd_unit.logger.id}",
-
-    // Kubernetes
-    "${data.ignition_systemd_unit.kubelet.id}",
-    "${data.ignition_systemd_unit.flanneld.id}",
-    "${data.ignition_systemd_unit.kubeproxy.id}",
-  ]
-
-  files = [
-    // Option files
-    "${data.ignition_file.cni_opts.id}",
-
-    // Installers
-    "${data.ignition_file.cni_installer.id}",
-    "${data.ignition_file.flanneld_installer.id}",
-    "${data.ignition_file.kubeproxy_installer.id}",
-    "${data.ignition_file.kubelet_installer.id}",
-
-    // Secrets / SSL
-    "${data.ignition_file.kubelet_kubeconfig.id}",
-    "${data.ignition_file.kubelet_pem.id}",
-    "${data.ignition_file.kubelet_key_pem.id}",
-    "${data.ignition_file.svcaccount_pem.id}",
-    "${data.ignition_file.svcaccount_key_pem.id}",
-  ]
-}
-
 data "ignition_file" "cni_opts" {
   filesystem = "root"
-  path = "/etc/cni/net.d/10-flannel.conf"
+  path       = "/etc/cni/net.d/10-flannel.conf"
 
   content {
     content = <<EOF
@@ -100,19 +33,23 @@ data "ignition_systemd_unit" "kubelet" {
 [Unit]
 Description=KubernetesKubelet
 Documentation=https://github.com/GoogleCloudPlatform/kubernetes
+Requires=coreos-metadata.service
+After=coreos-metadata.service
 
 [Service]
+EnvironmentFile=/run/metadata/coreos
 ExecStartPre=/opt/bin/kubelet-installer
 ExecStartPre=/opt/bin/cni-installer
 ExecStart=/opt/bin/kubelet \
   --api-servers=https://${var.api_server} \
   --cluster-domain=cluster.local \
   --allow-privileged=true \
-  --register-schedulable=false \
+  --hostname-override=$${COREOS_EC2_IPV4_LOCAL} \
   --container-runtime=docker \
   --network-plugin=cni \
   --kubeconfig=/etc/kubernetes/secrets/kubelet.kubeconfig \
   --serialize-image-pulls=false \
+  --register-schedulable=true \
   --register-node=true \
   --tls-cert-file=/etc/kubernetes/secrets/kubelet.pem \
   --tls-private-key-file=/etc/kubernetes/secrets/kubelet-key.pem
@@ -152,7 +89,7 @@ EOF
 }
 
 data "ignition_systemd_unit" "flanneld" {
-  name = "flannel.service"
+  name   = "flannel.service"
   enable = true
 
   content = <<EOF
@@ -165,6 +102,9 @@ After=coreos-metadata.service
 [Service]
 EnvironmentFile=/run/metadata/coreos
 ExecStartPre=/opt/bin/flanneld-installer
+ExecStartPre=/usr/bin/etcdctl \
+  --endpoints=${join(",", var.etcd_nodes)} \
+  set /flanneld/${var.cluster_name}/config '{"Network": "${var.pod_network}"}'
 ExecStart=/opt/bin/flanneld \
   --iface=$${COREOS_EC2_IPV4_LOCAL} \
   --etcd-endpoints=${join(",", var.etcd_nodes)} \

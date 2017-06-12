@@ -1,19 +1,19 @@
 module "vpc" {
-  source = "../vpc"
+  source = "./vpc"
 
   vpc_name     = "${var.vpc_name}"
-  cidr = "${var.node_network}"
+  cidr         = "${var.node_network}"
   state_bucket = "${var.state_bucket}"
 }
 
 module "iam" {
-  source = "../iam"
+  source = "./iam"
 
   cluster_name = "${var.cluster_name}"
 }
 
 module "etcd" {
-  source = "../etcd"
+  source = "./etcd"
 
   dns_zone_id  = "${var.dns_zone_id}"
   base_domain  = "${var.base_domain}"
@@ -35,7 +35,7 @@ module "etcd" {
 }
 
 module "master" {
-  source = "../master"
+  source = "./master"
 
   dns_zone_id  = "${var.dns_zone_id}"
   base_domain  = "${var.base_domain}"
@@ -55,11 +55,11 @@ module "master" {
   instance_size = "${var.master_instance_size}"
   ssh_key       = "${var.ssh_key}"
 
-  etcd_nodes         = ["${module.etcd.etcd_nodes}"]
+  etcd_nodes = ["${module.etcd.etcd_nodes}"]
 
   kubernetes_version = "${var.kubernetes_version}"
-  cni_version = "${var.cni_version}"
-  flanneld_version = "${var.flanneld_version}"
+  cni_version        = "${var.cni_version}"
+  flanneld_version   = "${var.flanneld_version}"
 
   dns_service_ip   = "${var.dns_service_ip}"
   node_network     = "${var.node_network}"
@@ -68,7 +68,7 @@ module "master" {
 }
 
 module "worker" {
-  source = "../worker"
+  source = "./worker"
 
   dns_zone_id  = "${var.dns_zone_id}"
   base_domain  = "${var.base_domain}"
@@ -86,11 +86,11 @@ module "worker" {
   instance_size = "${var.worker_instance_size}"
   ssh_key       = "${var.ssh_key}"
 
-  etcd_nodes         = ["${module.etcd.etcd_nodes}"]
+  etcd_nodes = ["${module.etcd.etcd_nodes}"]
 
   kubernetes_version = "${var.kubernetes_version}"
-  cni_version = "${var.cni_version}"
-  flanneld_version = "${var.flanneld_version}"
+  cni_version        = "${var.cni_version}"
+  flanneld_version   = "${var.flanneld_version}"
 
   api_server       = "${module.master.api_server}"
   dns_service_ip   = "${var.dns_service_ip}"

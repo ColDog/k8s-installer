@@ -10,15 +10,23 @@ terraform {
   }
 }
 
-module "cluster" {
-  source = "./cluster"
+//module "cluster" {
+//  source = "./cluster"
+//
+//  dns_zone_id  = "Z3FHNMGH8LFH0Q"
+//  base_domain  = "coldog.xyz"
+//  state_bucket = "state.default.coldog.xyz"
+//  cluster_name = "default"
+//}
+//
+//output "api_server" {
+//  value = "${module.cluster.api_server}"
+//}
 
-  dns_zone_id  = "Z3FHNMGH8LFH0Q"
-  base_domain  = "coldog.xyz"
-  state_bucket = "state.default.coldog.xyz"
-  cluster_name = "default"
-}
+module "vault" {
+  source = "./vault"
 
-output "api_server" {
-  value = "${module.cluster.api_server}"
+  bucket             = "vault.coldog.xyz"
+  dns_zone_id        = "Z3FHNMGH8LFH0Q"
+  ssl_certificate_id = "arn:aws:acm:us-east-1:414904551680:certificate/8ea61258-d7c4-4528-8255-cf478e4410e8"
 }

@@ -1,10 +1,10 @@
 variable "vpc_name" {}
 
+variable "state_bucket" {}
+
 variable "cidr" {
   default = "10.0.0.0/16"
 }
-
-variable "state_bucket" {}
 
 output "subnet_ids" {
   value = ["${aws_subnet.main_subnets.*.id}"]

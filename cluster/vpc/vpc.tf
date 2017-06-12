@@ -13,12 +13,12 @@ resource "aws_vpc" "main_vpc" {
 resource "aws_subnet" "main_subnets" {
   count                   = "${length(data.aws_availability_zones.zones.names)}"
   vpc_id                  = "${aws_vpc.main_vpc.id}"
-  cidr_block              = "${cidrsubnet(var.cidr, 2, length(data.aws_availability_zones.zones.names))}"
+  cidr_block              = "${cidrsubnet(var.cidr, 4, count.index)}"
   availability_zone       = "${data.aws_availability_zones.zones.names[count.index]}"
   map_public_ip_on_launch = true
 
   tags {
-    Name = "${var.vpc_name}.${count.index}"
+    Name = "${var.vpc_name}_${count.index}"
   }
 }
 

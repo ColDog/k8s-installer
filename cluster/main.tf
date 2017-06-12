@@ -11,57 +11,53 @@ variable "cluster_name" {
 }
 
 variable "ssh_key" {
-  default = "default_key"
+  default     = "default_key"
   description = "SSH key name, this should be created in the aws dashboard."
 }
 
 variable "etcd_container_image" {
-  default = "quay.io/coreos/etcd:latest"
+  default     = "quay.io/coreos/etcd:latest"
   description = "Etcd container image, used to launch the etcd containers. Kept at latest by default."
 }
 
 variable "kubernetes_version" {
-  default = "v1.6.4"
+  default     = "v1.6.4"
   description = "Kubernetes version, this is used across all Kubernetes services."
 }
 
 variable "flanneld_version" {
-  default = "v0.7.1"
+  default     = "v0.7.1"
   description = "Flanneld version."
 }
 
 variable "cni_version" {
-  default = "v0.5.2"
+  default     = "v0.5.2"
   description = "CNI version."
 }
 
 variable "etcd_instances" {
-  default = 3
+  default     = 3
   description = "Count of etcd instances to launch, each will be identified by index etc0 - n."
 }
 
 variable "etcd_instance_size" {
-  default = "t2.small"
+  default     = "t2.small"
   description = "AWS EC2 instance size."
 }
 
 variable "worker_instance_size" {
-  default = "t2.small"
+  default     = "t2.small"
   description = "AWS EC2 instance size."
 }
 
 variable "master_instance_size" {
-  default = "t2.small"
+  default     = "t2.small"
   description = "AWS EC2 instance size."
 }
 
 variable "vpc_name" {
   default = "default"
 }
-
-// Setup:
-// cluster: 10.0.0.0/16 => 10.0.0.0 - 10.0.255.255
-// pods:
 
 variable "node_network" {
   default     = "10.0.0.0/16"
