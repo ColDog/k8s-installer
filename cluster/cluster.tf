@@ -61,6 +61,8 @@ module "master" {
   cni_version        = "${var.cni_version}"
   flanneld_version   = "${var.flanneld_version}"
 
+  vault_addr = "${var.vault_addr}"
+
   dns_service_ip   = "${var.dns_service_ip}"
   node_network     = "${var.node_network}"
   service_ip_range = "${var.service_ip_range}"
@@ -92,9 +94,16 @@ module "worker" {
   cni_version        = "${var.cni_version}"
   flanneld_version   = "${var.flanneld_version}"
 
+  vault_addr = "${var.vault_addr}"
+
   api_server       = "${module.master.api_server}"
   dns_service_ip   = "${var.dns_service_ip}"
   node_network     = "${var.node_network}"
   service_ip_range = "${var.service_ip_range}"
   pod_network      = "${var.pod_network}"
+}
+
+module "vault" {
+  source       = "./vault"
+  cluster_name = "${var.cluster_name}"
 }

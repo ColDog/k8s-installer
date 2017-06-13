@@ -56,6 +56,8 @@ variable "service_ip_range" {}
 
 variable "dns_service_ip" {}
 
+variable "vault_addr" {}
+
 output "api_server" {
   value = "${aws_route53_record.api_server.fqdn}"
 }

@@ -4,6 +4,7 @@ module "node" {
   etcd_nodes   = "${var.etcd_nodes}"
   cluster_name = "${var.cluster_name}"
   api_server   = "${var.api_server}"
+  vault_addr   = "${var.vault_addr}"
 
   dns_service_ip   = "${var.dns_service_ip}"
   node_network     = "${var.node_network}"

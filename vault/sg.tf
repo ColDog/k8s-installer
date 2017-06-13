@@ -26,8 +26,8 @@ resource "aws_security_group" "lb" {
 }
 
 resource "aws_security_group" "instance" {
-  name        = "vault_lb"
-  description = "External vault security group"
+  name        = "vault_instance"
+  description = "Instance vault security group"
   vpc_id      = "${data.aws_vpc.vault.id}"
 
   ingress {

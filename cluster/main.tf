@@ -84,6 +84,10 @@ variable "dns_service_ip" {
   description = "The VIP (Virtual IP) address of the cluster DNS service. This IP must be in the range of the SERVICE_IP_RANGE and cannot be the first IP in the range. This same IP must be configured on all worker nodes to enable DNS service discovery."
 }
 
+variable "vault_addr" {
+  description = "Vault HTTPS endpoint."
+}
+
 output "api_server" {
   value = "${module.master.api_server}"
 }

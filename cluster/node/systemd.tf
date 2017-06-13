@@ -15,6 +15,48 @@ EOF
   }
 }
 
+data "ignition_systemd_unit" "bootstrap_master" {
+  name   = "bootstrap.service"
+  enable = true
+
+  content = <<EOF
+[Unit]
+Description=BootstrapService
+Requires=coreos-metadata.service
+After=coreos-metadata.service
+
+[Service]
+Type=oneshot
+EnvironmentFile=/run/metadata/coreos
+EnvironmentFile=/etc/kubernetes/options.env
+ExecStart=/opt/bin/bootstrap-master
+
+[Install]
+WantedBy=multi-user.target
+EOF
+}
+
+data "ignition_systemd_unit" "bootstrap_worker" {
+  name   = "bootstrap.service"
+  enable = true
+
+  content = <<EOF
+[Unit]
+Description=BootstrapService
+Requires=coreos-metadata.service
+After=coreos-metadata.service
+
+[Service]
+Type=oneshot
+EnvironmentFile=/run/metadata/coreos
+EnvironmentFile=/etc/kubernetes/options.env
+ExecStart=/opt/bin/bootstrap-worker
+
+[Install]
+WantedBy=multi-user.target
+EOF
+}
+
 data "ignition_systemd_unit" "metadata" {
   name   = "coreos-metadata.service"
   enable = true
@@ -27,14 +69,14 @@ data "ignition_systemd_unit" "docker" {
 
 data "ignition_systemd_unit" "kubelet" {
   name   = "kubelet.service"
-  enable = true
+  enable = false
 
   content = <<EOF
 [Unit]
 Description=KubernetesKubelet
 Documentation=https://github.com/GoogleCloudPlatform/kubernetes
-Requires=coreos-metadata.service
-After=coreos-metadata.service
+Requires=bootstrap.service
+After=bootstrap.service
 
 [Service]
 EnvironmentFile=/run/metadata/coreos
@@ -64,12 +106,14 @@ EOF
 
 data "ignition_systemd_unit" "kubeproxy" {
   name   = "kubeproxy.service"
-  enable = true
+  enable = false
 
   content = <<EOF
 [Unit]
 Description=KubernetesKubeProxy
 Documentation=https://github.com/GoogleCloudPlatform/kubernetes
+Requires=bootstrap.service
+After=bootstrap.service
 
 [Service]
 ExecStartPre=/opt/bin/kubeproxy-installer
@@ -90,14 +134,14 @@ EOF
 
 data "ignition_systemd_unit" "flanneld" {
   name   = "flannel.service"
-  enable = true
+  enable = false
 
   content = <<EOF
 [Unit]
 Description=FlannelDaemon
 Documentation=https://github.com/coreos/flannel
-Requires=coreos-metadata.service
-After=coreos-metadata.service
+Requires=bootstrap.service
+After=bootstrap.service
 
 [Service]
 EnvironmentFile=/run/metadata/coreos
@@ -120,7 +164,7 @@ EOF
 
 data "ignition_systemd_unit" "logger" {
   name   = "logger.service"
-  enable = true
+  enable = false
 
   content = <<EOF
 [Unit]
@@ -144,12 +188,14 @@ EOF
 
 data "ignition_systemd_unit" "apiserver" {
   name   = "apiserver.service"
-  enable = true
+  enable = false
 
   content = <<EOF
 [Unit]
 Description=KubernetesApiServer
 Documentation=https://github.com/GoogleCloudPlatform/kubernetes
+Requires=bootstrap.service
+After=bootstrap.service
 
 [Service]
 ExecStartPre=-/usr/bin/docker stop apiserver.service
@@ -187,12 +233,14 @@ EOF
 
 data "ignition_systemd_unit" "controllermanager" {
   name   = "controllermanager.service"
-  enable = true
+  enable = false
 
   content = <<EOF
 [Unit]
 Description=KubernetesControllerManager
 Documentation=https://github.com/GoogleCloudPlatform/kubernetes
+Requires=bootstrap.service
+After=bootstrap.service
 
 [Service]
 ExecStartPre=-/usr/bin/docker stop controllermanager.service
@@ -210,7 +258,6 @@ ExecStart=/usr/bin/docker run --name=controllermanager.service \
   --cluster-name=${var.cluster_name} \
   --leader-elect=true \
   --root-ca-file=/etc/kubernetes/secrets/ca.pem \
-  --service-account-private-key-file=/etc/kubernetes/secrets/svcaccount-key.pem \
   --v=2
 ExecStop=/usr/bin/docker stop controllermanager.service
 
@@ -221,12 +268,14 @@ EOF
 
 data "ignition_systemd_unit" "scheduler" {
   name   = "scheduler.service"
-  enable = true
+  enable = false
 
   content = <<EOF
 [Unit]
 Description=KubernetesScheduler
 Documentation=https://github.com/GoogleCloudPlatform/kubernetes
+Requires=bootstrap.service
+After=bootstrap.service
 
 [Service]
 ExecStartPre=-/usr/bin/docker stop scheduler.service

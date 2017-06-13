@@ -1,10 +1,10 @@
 variable "dns_zone_id" {}
 
-variable "ssl_certificate_id" {}
-
 variable "dns_name" {
   default = "vault"
 }
+
+variable "domain" {}
 
 variable "bucket" {}
 

@@ -44,11 +44,24 @@ data "ignition_config" "worker" {
     // Option files
     "${data.ignition_file.cni_opts.id}",
 
+    "${data.ignition_file.options_env.id}",
+
     // Installers
     "${data.ignition_file.cni_installer.id}",
 
     "${data.ignition_file.flanneld_installer.id}",
     "${data.ignition_file.kubeproxy_installer.id}",
     "${data.ignition_file.kubelet_installer.id}",
+
+    // Scripts
+    "${data.ignition_file.vault_login.id}",
+
+    "${data.ignition_file.get_certs.id}",
+    "${data.ignition_file.get_kubeconfig.id}",
+
+    // Bootstrap
+    "${data.ignition_file.bootstrap_master.id}",
+
+    "${data.ignition_file.bootstrap_worker.id}",
   ]
 }

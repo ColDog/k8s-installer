@@ -14,6 +14,8 @@ variable "cluster_name" {}
 
 variable "api_server" {}
 
+variable "vault_addr" {}
+
 variable "node_network" {}
 
 variable "pod_network" {}

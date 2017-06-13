@@ -6,6 +6,10 @@ data "aws_subnet_ids" "vault" {
   vpc_id = "${data.aws_vpc.vault.id}"
 }
 
+data "aws_acm_certificate" "main" {
+  domain = "${var.domain}"
+}
+
 resource "aws_route53_record" "vault" {
   zone_id = "${var.dns_zone_id}"
   name    = "${var.dns_name}"
@@ -29,7 +33,7 @@ resource "aws_elb" "vault" {
     lb_protocol        = "https"
     instance_port      = 80
     instance_protocol  = "http"
-    ssl_certificate_id = "${var.ssl_certificate_id}"
+    ssl_certificate_id = "${data.aws_acm_certificate.main.arn}"
   }
 
   health_check {

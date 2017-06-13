@@ -20,17 +20,18 @@ After=docker.service
 Requires=docker.service
 
 [Service]
-ExexStartPre=-/usr/bin/docker stop vault.service
-ExexStartPre=-/usr/bin/docker rm vault.service
+ExecStartPre=-/usr/bin/docker stop vault.service
+ExecStartPre=-/usr/bin/docker rm vault.service
 ExecStart=/usr/bin/docker run \
+  -v /etc/vault:/etc/vault/ \
   --name=vault.service \
-  -v /etc/vault/:/etc/vault \
-  -p 80:80 \
-  ${var.container_image} \
+  --privileged \
+  -p 80:8200 \
+  vault:latest \
   vault server -config=/etc/vault/config.hcl
 ExecStop=/usr/bin/docker stop vault.service
 Restart=on-failure
-RestartSec=5
+RestartSec=15
 Restart=always
 
 [Install]
@@ -38,19 +39,24 @@ WantedBy=multi-user.target
 EOF
 }
 
+data "aws_region" "current" {
+  current = true
+}
+
 data "ignition_file" "vault_config" {
   filesystem = "root"
   path       = "/etc/vault/config.hcl"
-  mode       = 0600
+  mode       = 0644
 
   content {
     content = <<EOF
 storage "s3" {
   bucket = "${var.bucket}"
+  region = "${data.aws_region.current.name}"
 }
 
 listener "tcp" {
-  address     = "0.0.0.0:80"
+  address     = "0.0.0.0:8200"
   tls_disable = 1
 }
 EOF
