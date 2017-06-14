@@ -1,0 +1,32 @@
+[Unit]
+Description=KubernetesControllerManager
+Documentation=https://github.com/GoogleCloudPlatform/kubernetes
+Requires=bootstrap.service
+After=bootstrap.service
+
+[Service]
+EnvironmentFile=/etc/kubernetes/options.env
+ExecStartPre=-/usr/bin/docker stop controllermanager.service
+ExecStartPre=-/usr/bin/docker rm controllermanager.service
+ExecStart=/usr/bin/docker run --name=controllermanager.service \
+    -v /etc/kubernetes/secrets:/etc/kubernetes/secrets \
+    quay.io/coreos/hyperkube:${K8S_VERSION}_coreos.0 \
+    /hyperkube \
+    controller-manager \
+    --address=0.0.0.0 \
+    --allocate-node-cidrs=true \
+    --cluster-cidr=${K8S_POD_NETWORK} \
+    --service-cluster-ip-range=${K8S_SERVICE_IP_RANGE} \
+    --service-account-private-key-file=/etc/kubernetes/secrets/serviceaccount-key.pem \
+    --kubeconfig=/etc/kubernetes/secrets/controllermanager.kubeconfig \
+    --cluster-name=${K8S_CLUSTER} \
+    --leader-elect=true \
+    --root-ca-file=/etc/kubernetes/secrets/controllermanager-ca.pem \
+    --v=2
+ExecStop=/usr/bin/docker stop controllermanager.service
+Restart=on-failure
+RestartSec=15
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

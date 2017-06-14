@@ -1,0 +1,13 @@
+[Unit]
+Description=BootstrapService
+Requires=coreos-metadata.service
+After=coreos-metadata.service
+
+[Service]
+Type=oneshot
+EnvironmentFile=/run/metadata/coreos
+EnvironmentFile=/etc/kubernetes/options.env
+ExecStart=/opt/bin/bootstrap-worker
+
+[Install]
+WantedBy=multi-user.target

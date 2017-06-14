@@ -1,0 +1,28 @@
+[Unit]
+Description=KubernetesKubelet
+Documentation=https://github.com/GoogleCloudPlatform/kubernetes
+Requires=bootstrap.service
+After=bootstrap.service
+
+[Service]
+EnvironmentFile=/run/metadata/coreos
+EnvironmentFile=/etc/kubernetes/options.env
+ExecStart=/opt/bin/kubelet \
+    --api-servers=https://${K8S_API} \
+    --cluster-domain=cluster.local \
+    --allow-privileged=true \
+    --hostname-override=${COREOS_EC2_IPV4_LOCAL} \
+    --container-runtime=docker \
+    --network-plugin=cni \
+    --kubeconfig=/etc/kubernetes/secrets/kubelet.kubeconfig \
+    --serialize-image-pulls=false \
+    --register-schedulable=true \
+    --register-node=true \
+    --tls-cert-file=/etc/kubernetes/secrets/kubelet.pem \
+    --tls-private-key-file=/etc/kubernetes/secrets/kubelet-key.pem
+Restart=on-failure
+RestartSec=5
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

@@ -24,7 +24,6 @@ data "ignition_config" "master" {
 
     // Scripts
     "${data.ignition_file.vault_login.id}",
-    "${data.ignition_file.get_ca.id}",
     "${data.ignition_file.get_certs.id}",
     "${data.ignition_file.get_kubeconfig.id}",
 
@@ -60,7 +59,6 @@ data "ignition_config" "worker" {
 
     // Scripts
     "${data.ignition_file.vault_login.id}",
-    "${data.ignition_file.get_ca.id}",
     "${data.ignition_file.get_certs.id}",
     "${data.ignition_file.get_kubeconfig.id}",
 

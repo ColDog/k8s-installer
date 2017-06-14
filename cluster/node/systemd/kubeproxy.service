@@ -1,0 +1,21 @@
+[Unit]
+Description=KubernetesKubeProxy
+Documentation=https://github.com/GoogleCloudPlatform/kubernetes
+Requires=bootstrap.service
+After=bootstrap.service
+
+[Service]
+EnvironmentFile=/etc/kubernetes/options.env
+ExecStartPre=/opt/bin/kubeproxy-installer
+ExecStart=/opt/bin/kube-proxy \
+    --cluster-cidr=${K8S_POD_NETWORK} \
+    --masquerade-all=true \
+    --kubeconfig=/etc/kubernetes/secrets/kubeproxy.kubeconfig \
+    --proxy-mode=iptables \
+    --v=2
+Restart=on-failure
+RestartSec=5
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

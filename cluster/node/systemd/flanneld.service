@@ -1,0 +1,19 @@
+[Unit]
+Description=FlannelDaemon
+Documentation=https://github.com/coreos/flannel
+Requires=bootstrap.service
+After=bootstrap.service
+
+[Service]
+EnvironmentFile=/run/metadata/coreos
+EnvironmentFile=/etc/kubernetes/options.env
+ExecStart=/opt/bin/flanneld \
+    --iface=${COREOS_EC2_IPV4_LOCAL} \
+    --etcd-endpoints=${K8S_ETCD_NODES} \
+    --etcd-prefix=/flanneld/$${K8S_CLUSTER}
+Restart=on-failure
+RestartSec=5
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

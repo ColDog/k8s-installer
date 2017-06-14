@@ -1,0 +1,25 @@
+[Unit]
+Description=KubernetesScheduler
+Documentation=https://github.com/GoogleCloudPlatform/kubernetes
+Requires=bootstrap.service
+After=bootstrap.service
+
+[Service]
+EnvironmentFile=/etc/kubernetes/options.env
+ExecStartPre=-/usr/bin/docker stop scheduler.service
+ExecStartPre=-/usr/bin/docker rm scheduler.service
+ExecStart=/usr/bin/docker run --name=scheduler.service \
+    -v /etc/kubernetes/secrets:/etc/kubernetes/secrets \
+    quay.io/coreos/hyperkube:${K8S_VERSION}_coreos.0 \
+    /hyperkube \
+    scheduler \
+    --leader-elect=true \
+    --kubeconfig=/etc/kubernetes/secrets/scheduler.kubeconfig \
+    --v=2
+ExecStop=/usr/bin/docker stop scheduler.service
+Restart=on-failure
+RestartSec=15
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

@@ -65,16 +65,6 @@ data "ignition_file" "bootstrap_worker" {
   }
 }
 
-data "ignition_file" "get_ca" {
-  path       = "/opt/bin/get-ca"
-  mode       = 0755
-  filesystem = "root"
-
-  content {
-    content = "${file("${path.module}/scripts/get-ca.sh")}"
-  }
-}
-
 data "ignition_file" "get_kubeconfig" {
   path       = "/opt/bin/get-kubeconfig"
   mode       = 0755
