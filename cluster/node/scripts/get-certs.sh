@@ -13,6 +13,8 @@ out=$( /usr/bin/curl --header "X-Vault-Token: $(cat /etc/vault/token)" \
     ${VAULT_ADDR}/v1/${K8S_CLUSTER}/pki/issue/${role} )
 
 
+echo "$out"
+
 /usr/bin/echo ${out} | /usr/bin/jq -r '.data.certificate' > /etc/kubernetes/secrets/${cn}.pem
 /usr/bin/echo ${out} | /usr/bin/jq -r '.data.private_key' > /etc/kubernetes/secrets/${cn}-key.pem
 /usr/bin/echo ${out} | /usr/bin/jq -r '.data.issuing_ca' > /etc/kubernetes/secrets/${cn}-ca.pem

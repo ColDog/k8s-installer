@@ -22,6 +22,9 @@ path "${cluster}/pki/issue/master" {
 path "${cluster}/pki/ca/pem" {
     policy = "read"
 }
+path "secret/${cluster}/token" {
+    policy = "read"
+}
 EOF
 
 cat "${cluster}-master.policy.hcl" | vault policy-write ${cluster}/master -
@@ -54,8 +57,12 @@ vault write ${cluster}/pki/roles/master \
 
 # Allowed to create kubelet certificates
 vault write ${cluster}/pki/roles/worker \
-    allowed_domains="kubelet,kube-proxy" \
+    allowed_domains="kubelet,kubeproxy" \
     allow_bare_domains=true \
     allow_ip_sans=true \
     allow_subdomains=false \
     max_ttl="720h"
+
+openssl genrsa 4096 > token.key
+vault write secret/${cluster}/token key=@token.key
+rm token.key

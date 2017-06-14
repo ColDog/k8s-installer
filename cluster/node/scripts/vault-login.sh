@@ -2,7 +2,7 @@
 
 set -e
 
-if -f /etc/vault/token; then
+if [ -f /etc/vault/token ]; then
     exit 0
 fi
 

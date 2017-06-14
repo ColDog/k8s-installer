@@ -1,4 +1,4 @@
-data "ignition_file" "options_env" {
+data "ignition_file" "cluster_opts" {
   path       = "/etc/kubernetes/options.env"
   mode       = 0755
   filesystem = "root"
@@ -14,6 +14,23 @@ K8S_SERVICE_IP_RANGE=${var.service_ip_range}
 K8S_ETCD_NODES=${join(",", var.etcd_nodes)}
 FLANNELD_VERSION=${var.flanneld_version}
 CNI_VERSION=${var.cni_version}
+EOF
+  }
+}
+
+data "ignition_file" "cni_opts" {
+  filesystem = "root"
+  path       = "/etc/cni/net.d/10-flannel.conf"
+
+  content {
+    content = <<EOF
+{
+  "name": "podnet",
+  "type": "flannel",
+  "delegate": {
+    "isDefaultGateway": true
+  }
+}
 EOF
   }
 }
@@ -75,6 +92,16 @@ data "ignition_file" "get_certs" {
 
   content {
     content = "${file("${path.module}/scripts/get-certs.sh")}"
+  }
+}
+
+data "ignition_file" "get_servicekey" {
+  path       = "/opt/bin/get-servicekey"
+  mode       = 0755
+  filesystem = "root"
+
+  content {
+    content = "${file("${path.module}/scripts/get-servicekey.sh")}"
   }
 }
 

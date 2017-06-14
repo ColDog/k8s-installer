@@ -1,20 +1,4 @@
-data "ignition_file" "cni_opts" {
-  filesystem = "root"
-  path       = "/etc/cni/net.d/10-flannel.conf"
-
-  content {
-    content = <<EOF
-{
-  "name": "podnet",
-  "type": "flannel",
-  "delegate": {
-    "isDefaultGateway": true
-  }
-}
-EOF
-  }
-}
-
+// todo: move these to separate files
 data "ignition_systemd_unit" "bootstrap_master" {
   name   = "bootstrap.service"
   enable = true
@@ -69,7 +53,7 @@ data "ignition_systemd_unit" "docker" {
 
 data "ignition_systemd_unit" "kubelet" {
   name   = "kubelet.service"
-  enable = false
+  enable = true
 
   content = <<EOF
 [Unit]
@@ -81,8 +65,6 @@ After=bootstrap.service
 [Service]
 EnvironmentFile=/run/metadata/coreos
 EnvironmentFile=/etc/kubernetes/options.env
-ExecStartPre=/opt/bin/kubelet-installer
-ExecStartPre=/opt/bin/cni-installer
 ExecStart=/opt/bin/kubelet \
   --api-servers=https://$${K8S_API} \
   --cluster-domain=cluster.local \
@@ -107,7 +89,7 @@ EOF
 
 data "ignition_systemd_unit" "kubeproxy" {
   name   = "kubeproxy.service"
-  enable = false
+  enable = true
 
   content = <<EOF
 [Unit]
@@ -122,7 +104,7 @@ ExecStartPre=/opt/bin/kubeproxy-installer
 ExecStart=/opt/bin/kube-proxy \
   --cluster-cidr=$${K8S_POD_NETWORK} \
   --masquerade-all=true \
-  --kubeconfig=/etc/kubernetes/secrets/kubelet.kubeconfig \
+  --kubeconfig=/etc/kubernetes/secrets/kubeproxy.kubeconfig \
   --proxy-mode=iptables \
   --v=2
 Restart=on-failure
@@ -136,7 +118,7 @@ EOF
 
 data "ignition_systemd_unit" "flanneld" {
   name   = "flannel.service"
-  enable = false
+  enable = true
 
   content = <<EOF
 [Unit]
@@ -165,33 +147,9 @@ WantedBy=multi-user.target
 EOF
 }
 
-data "ignition_systemd_unit" "logger" {
-  name   = "logger.service"
-  enable = false
-
-  content = <<EOF
-[Unit]
-After=docker.service
-Requires=docker.service
-
-[Service]
-ExecStartPre=-/usr/bin/docker stop logger.service
-ExecStartPre=-/usr/bin/docker rm logger.service
-ExecStart=/usr/bin/bash \
-  -c '/usr/bin/journalctl -o short-iso -f | /usr/bin/docker run -i --name=logger.service coldog/awslogger -stream=$(hostname) -group=${var.cluster_name}'
-ExecStop=/usr/bin/docker stop logger.service
-Restart=on-failure
-RestartSec=5
-Restart=always
-
-[Install]
-WantedBy=multi-user.target
-EOF
-}
-
 data "ignition_systemd_unit" "apiserver" {
   name   = "apiserver.service"
-  enable = false
+  enable = true
 
   content = <<EOF
 [Unit]
@@ -212,6 +170,7 @@ ExecStart=/usr/bin/docker run --name=apiserver.service \
   /hyperkube \
   apiserver \
   --v=1 \
+  --admission-control=NamespaceLifecycle,LimitRanger,ServiceAccount,DefaultStorageClass,ResourceQuota \
   --advertise-address=0.0.0.0 \
   --bind-address=0.0.0.0 \
   --secure-port=443 \
@@ -220,7 +179,7 @@ ExecStart=/usr/bin/docker run --name=apiserver.service \
   --service-cluster-ip-range=$${K8S_SERVICE_IP_RANGE} \
   --etcd-servers=$${K8S_ETCD_NODES} \
   --client-ca-file=/etc/kubernetes/secrets/ca.pem \
-  --service-account-key-file=/etc/kubernetes/secrets/svcaccount-key.pem \
+  --service-account-key-file=/etc/kubernetes/secrets/serviceaccount-key.pem \
   --kubelet-certificate-authority=/etc/kubernetes/secrets/ca.pem \
   --kubelet-client-certificate=/etc/kubernetes/secrets/kubelet.pem \
   --kubelet-client-key=/etc/kubernetes/secrets/kubelet-key.pem \
@@ -237,7 +196,7 @@ EOF
 
 data "ignition_systemd_unit" "controllermanager" {
   name   = "controllermanager.service"
-  enable = false
+  enable = true
 
   content = <<EOF
 [Unit]
@@ -259,7 +218,8 @@ ExecStart=/usr/bin/docker run --name=controllermanager.service \
   --allocate-node-cidrs=true \
   --cluster-cidr=$${K8S_POD_NETWORK} \
   --service-cluster-ip-range=$${K8S_SERVICE_IP_RANGE} \
-  --kubeconfig=/etc/kubernetes/secrets/controller.kubeconfig \
+  --service-account-private-key-file=/etc/kubernetes/secrets/serviceaccount-key.pem \
+  --kubeconfig=/etc/kubernetes/secrets/controllermanager.kubeconfig \
   --cluster-name=$${K8S_CLUSTER} \
   --leader-elect=true \
   --root-ca-file=/etc/kubernetes/secrets/ca.pem \
@@ -273,7 +233,7 @@ EOF
 
 data "ignition_systemd_unit" "scheduler" {
   name   = "scheduler.service"
-  enable = false
+  enable = true
 
   content = <<EOF
 [Unit]

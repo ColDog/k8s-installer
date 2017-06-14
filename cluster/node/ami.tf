@@ -1,3 +1,4 @@
+// todo: build custom ami
 data "aws_ami" "coreos_ami" {
   most_recent = true
 

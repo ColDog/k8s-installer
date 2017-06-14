@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+cluster="$1"
+user="$2"
+
+vault write ${cluster}/pki/roles/${user} \
+    allowed_domains="$user" \
+    allow_bare_domains=true \
+    allow_subdomains=false \
+    max_ttl="24h"
+
+cat <<EOT | vault policy-write ${cluster}/${user} -
+path "${cluster}/pki/issue/${user}" {
+  policy = "write"
+}
+EOT
+
+# allow this user access to this policy..

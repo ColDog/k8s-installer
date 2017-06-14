@@ -7,7 +7,6 @@ data "ignition_config" "master" {
 
     // Kubernetes
     "${data.ignition_systemd_unit.controllermanager.id}",
-
     "${data.ignition_systemd_unit.scheduler.id}",
     "${data.ignition_systemd_unit.apiserver.id}",
   ]
@@ -15,7 +14,7 @@ data "ignition_config" "master" {
   files = [
     // Option files
     "${data.ignition_file.cni_opts.id}",
-    "${data.ignition_file.options_env.id}",
+    "${data.ignition_file.cluster_opts.id}",
 
     // Installers
     "${data.ignition_file.cni_installer.id}",
@@ -51,7 +50,7 @@ data "ignition_config" "worker" {
   files = [
     // Option files
     "${data.ignition_file.cni_opts.id}",
-    "${data.ignition_file.options_env.id}",
+    "${data.ignition_file.cluster_opts.id}",
 
     // Installers
     "${data.ignition_file.cni_installer.id}",
