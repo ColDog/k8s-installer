@@ -16,10 +16,6 @@ variable "etcd_nodes" {
 
 variable "iam_profile" {}
 
-variable "state_bucket" {
-  type = "string"
-}
-
 variable "instance_size" {}
 
 variable "ssh_key" {}

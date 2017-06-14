@@ -1,7 +1,5 @@
 variable "vpc_name" {}
 
-variable "state_bucket" {}
-
 variable "cidr" {
   default = "10.0.0.0/16"
 }

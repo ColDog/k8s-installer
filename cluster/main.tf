@@ -1,9 +1,9 @@
-variable "dns_zone_id" {}
+variable "dns_zone_id" {
+  description = "AWS DNS Zone ID."
+}
 
-variable "base_domain" {}
-
-variable "state_bucket" {
-  description = "S3 Bucket."
+variable "base_domain" {
+  description = "Base domain for the provided DNS zone."
 }
 
 variable "cluster_name" {
@@ -86,8 +86,4 @@ variable "dns_service_ip" {
 
 variable "vault_addr" {
   description = "Vault HTTPS endpoint."
-}
-
-output "api_server" {
-  value = "${module.master.api_server}"
 }

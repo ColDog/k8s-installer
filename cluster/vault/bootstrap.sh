@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 cluster="$1"
+account="$2"
 
 cat > ${cluster}-worker.policy.hcl <<EOF
 path "${cluster}/pki/issue/worker" {
@@ -26,12 +27,15 @@ EOF
 cat "${cluster}-master.policy.hcl" | vault policy-write ${cluster}/master -
 cat "${cluster}-worker.policy.hcl" | vault policy-write ${cluster}/worker -
 
+rm "${cluster}-master.policy.hcl"
+rm "${cluster}-worker.policy.hcl"
+
 vault write auth/aws-ec2/role/worker \
-    bound_iam_instance_profile_arn=arn:aws:iam::*:role/${cluster}_worker_role \
+    bound_iam_instance_profile_arn=arn:aws:iam::${account}:instance-profile/${cluster}_worker_profile \
     policies=${cluster}/worker
 
 vault write auth/aws-ec2/role/master \
-    bound_iam_instance_profile_arn=arn:aws:iam::*:role/${cluster}_master_role \
+    bound_iam_instance_profile_arn=arn:aws:iam::${account}:instance-profile/${cluster}_master_profile \
     policies=${cluster}/master
 
 # Setup vault PKI backend

@@ -80,10 +80,11 @@ After=bootstrap.service
 
 [Service]
 EnvironmentFile=/run/metadata/coreos
+EnvironmentFile=/etc/kubernetes/options.env
 ExecStartPre=/opt/bin/kubelet-installer
 ExecStartPre=/opt/bin/cni-installer
 ExecStart=/opt/bin/kubelet \
-  --api-servers=https://${var.api_server} \
+  --api-servers=https://$${K8S_API} \
   --cluster-domain=cluster.local \
   --allow-privileged=true \
   --hostname-override=$${COREOS_EC2_IPV4_LOCAL} \
@@ -116,9 +117,10 @@ Requires=bootstrap.service
 After=bootstrap.service
 
 [Service]
+EnvironmentFile=/etc/kubernetes/options.env
 ExecStartPre=/opt/bin/kubeproxy-installer
 ExecStart=/opt/bin/kube-proxy \
-  --cluster-cidr=${var.pod_network} \
+  --cluster-cidr=$${K8S_POD_NETWORK} \
   --masquerade-all=true \
   --kubeconfig=/etc/kubernetes/secrets/kubelet.kubeconfig \
   --proxy-mode=iptables \
@@ -145,14 +147,15 @@ After=bootstrap.service
 
 [Service]
 EnvironmentFile=/run/metadata/coreos
+EnvironmentFile=/etc/kubernetes/options.env
 ExecStartPre=/opt/bin/flanneld-installer
 ExecStartPre=/usr/bin/etcdctl \
   --endpoints=${join(",", var.etcd_nodes)} \
   set /flanneld/${var.cluster_name}/config '{"Network": "${var.pod_network}"}'
 ExecStart=/opt/bin/flanneld \
   --iface=$${COREOS_EC2_IPV4_LOCAL} \
-  --etcd-endpoints=${join(",", var.etcd_nodes)} \
-  --etcd-prefix=/flanneld/${var.cluster_name}
+  --etcd-endpoints=$${K8S_ETCD_NODES} \
+  --etcd-prefix=/flanneld/$${K8S_CLUSTER}
 Restart=on-failure
 RestartSec=5
 Restart=always
@@ -198,13 +201,14 @@ Requires=bootstrap.service
 After=bootstrap.service
 
 [Service]
+EnvironmentFile=/etc/kubernetes/options.env
 ExecStartPre=-/usr/bin/docker stop apiserver.service
 ExecStartPre=-/usr/bin/docker rm apiserver.service
 ExecStart=/usr/bin/docker run --name=apiserver.service \
   -p 443:443 \
   -p 127.0.0.1:80:80 \
   -v /etc/kubernetes/secrets:/etc/kubernetes/secrets \
-  quay.io/coreos/hyperkube:${var.kubernetes_version}_coreos.0 \
+  quay.io/coreos/hyperkube:$${K8S_VERSION}_coreos.0 \
   /hyperkube \
   apiserver \
   --v=1 \
@@ -213,8 +217,8 @@ ExecStart=/usr/bin/docker run --name=apiserver.service \
   --secure-port=443 \
   --insecure-port=80 \
   --insecure-bind-address=0.0.0.0 \
-  --service-cluster-ip-range=${var.service_ip_range} \
-  --etcd-servers=${join(",", var.etcd_nodes)} \
+  --service-cluster-ip-range=$${K8S_SERVICE_IP_RANGE} \
+  --etcd-servers=$${K8S_ETCD_NODES} \
   --client-ca-file=/etc/kubernetes/secrets/ca.pem \
   --service-account-key-file=/etc/kubernetes/secrets/svcaccount-key.pem \
   --kubelet-certificate-authority=/etc/kubernetes/secrets/ca.pem \
@@ -243,19 +247,20 @@ Requires=bootstrap.service
 After=bootstrap.service
 
 [Service]
+EnvironmentFile=/etc/kubernetes/options.env
 ExecStartPre=-/usr/bin/docker stop controllermanager.service
 ExecStartPre=-/usr/bin/docker rm controllermanager.service
 ExecStart=/usr/bin/docker run --name=controllermanager.service \
   -v /etc/kubernetes/secrets:/etc/kubernetes/secrets \
-  quay.io/coreos/hyperkube:${var.kubernetes_version}_coreos.0 \
+  quay.io/coreos/hyperkube:$${K8S_VERSION}_coreos.0 \
   /hyperkube \
   controller-manager \
   --address=0.0.0.0 \
   --allocate-node-cidrs=true \
-  --cluster-cidr=${var.pod_network} \
-  --service-cluster-ip-range=${var.service_ip_range} \
+  --cluster-cidr=$${K8S_POD_NETWORK} \
+  --service-cluster-ip-range=$${K8S_SERVICE_IP_RANGE} \
   --kubeconfig=/etc/kubernetes/secrets/controller.kubeconfig \
-  --cluster-name=${var.cluster_name} \
+  --cluster-name=$${K8S_CLUSTER} \
   --leader-elect=true \
   --root-ca-file=/etc/kubernetes/secrets/ca.pem \
   --v=2
@@ -278,15 +283,16 @@ Requires=bootstrap.service
 After=bootstrap.service
 
 [Service]
+EnvironmentFile=/etc/kubernetes/options.env
 ExecStartPre=-/usr/bin/docker stop scheduler.service
 ExecStartPre=-/usr/bin/docker rm scheduler.service
 ExecStart=/usr/bin/docker run --name=scheduler.service \
   -v /etc/kubernetes/secrets:/etc/kubernetes/secrets \
-  quay.io/coreos/hyperkube:${var.kubernetes_version}_coreos.0 \
+  quay.io/coreos/hyperkube:$${K8S_VERSION}_coreos.0 \
   /hyperkube \
   scheduler \
   --leader-elect=true \
-  --kubeconfig=/etc/kubernetes/secrets/controller.kubeconfig \
+  --kubeconfig=/etc/kubernetes/secrets/scheduler.kubeconfig \
   --v=2
 ExecStop=/usr/bin/docker stop scheduler.service
 

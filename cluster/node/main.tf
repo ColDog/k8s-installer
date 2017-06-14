@@ -2,8 +2,6 @@ variable "etcd_nodes" {
   type = "list"
 }
 
-variable "state_bucket" {}
-
 variable "kubernetes_version" {}
 
 variable "flanneld_version" {}

@@ -4,8 +4,6 @@ variable "base_domain" {}
 
 variable "cluster_name" {}
 
-variable "state_bucket" {}
-
 variable "kubernetes_version" {}
 
 variable "cni_version" {}

@@ -1,9 +1,13 @@
+module "vault" {
+  source       = "./vault"
+  cluster_name = "${var.cluster_name}"
+}
+
 module "vpc" {
   source = "./vpc"
 
   vpc_name     = "${var.vpc_name}"
   cidr         = "${var.node_network}"
-  state_bucket = "${var.state_bucket}"
 }
 
 module "iam" {
@@ -40,7 +44,6 @@ module "master" {
   dns_zone_id  = "${var.dns_zone_id}"
   base_domain  = "${var.base_domain}"
   cluster_name = "${var.cluster_name}"
-  state_bucket = "${var.state_bucket}"
 
   subnets     = ["${module.vpc.subnet_ids}"]
   elb_sgs     = ["${module.vpc.sg_external_lb_https}"]
@@ -75,7 +78,6 @@ module "worker" {
   dns_zone_id  = "${var.dns_zone_id}"
   base_domain  = "${var.base_domain}"
   cluster_name = "${var.cluster_name}"
-  state_bucket = "${var.state_bucket}"
 
   subnets     = ["${module.vpc.subnet_ids}"]
   iam_profile = "${module.iam.worker_profile}"
@@ -101,9 +103,4 @@ module "worker" {
   node_network     = "${var.node_network}"
   service_ip_range = "${var.service_ip_range}"
   pod_network      = "${var.pod_network}"
-}
-
-module "vault" {
-  source       = "./vault"
-  cluster_name = "${var.cluster_name}"
 }
