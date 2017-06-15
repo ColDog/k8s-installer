@@ -1,6 +1,11 @@
 resource "aws_iam_instance_profile" "etcd_profile" {
   name = "${var.cluster_name}_etcd_profile"
   role = "${aws_iam_role.etcd_role.name}"
+
+  provisioner "local-exec" {
+    // The failure of this to propagate when etcd is launching requires that we sleep for x minutes here.
+    command = "sleep 30"
+  }
 }
 
 resource "aws_iam_role" "etcd_role" {

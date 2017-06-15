@@ -1,9 +1,5 @@
-variable "dns_zone_id" {
-  description = "AWS DNS Zone ID."
-}
-
 variable "base_domain" {
-  description = "Base domain for the provided DNS zone."
+  description = "Route53 public zone to setup entries."
 }
 
 variable "cluster_name" {
@@ -74,7 +70,7 @@ variable "service_ip_range" {
   description = "The CIDR network to use for service cluster VIPs (Virtual IPs). Each service will be assigned a cluster IP out of this range. This must not overlap with any IP ranges assigned to the POD_NETWORK, or other existing network infrastructure. Routing to these VIPs is handled by a local kube-proxy service to each host, and are not required to be routable between hosts."
 }
 
-variable "k8s_service_ip" {
+variable "api_service_ip" {
   default     = "10.3.0.1"
   description = "The VIP (Virtual IP) address of the Kubernetes API Service. If the SERVICE_IP_RANGE is changed above, this must be set to the first IP in that range."
 }

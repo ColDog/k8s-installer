@@ -11,6 +11,7 @@ K8S_CLUSTER=${var.cluster_name}
 K8S_VERSION=${var.kubernetes_version}
 K8S_POD_NETWORK=${var.pod_network}
 K8S_SERVICE_IP_RANGE=${var.service_ip_range}
+K8S_API_SERVICE_IP=${var.api_service_ip}
 K8S_ETCD_NODES=${join(",", var.etcd_nodes)}
 FLANNELD_VERSION=${var.flanneld_version}
 CNI_VERSION=${var.cni_version}

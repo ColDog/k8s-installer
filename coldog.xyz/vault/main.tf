@@ -13,8 +13,11 @@ terraform {
 module "vault" {
   source = "../../vault"
 
-  bucket      = "vault.coldog.xyz"
-  dns_zone_id = "Z3FHNMGH8LFH0Q"
-  domain      = "coldog.xyz"
-  dns_name    = "vault"
+  bucket   = "vault.coldog.xyz"
+  domain   = "coldog.xyz"
+  dns_name = "vault"
+
+  instance_type = "t2.micro"
+  instances = 1
+  container_image = "vault:lates"
 }

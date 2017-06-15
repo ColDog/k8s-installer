@@ -50,6 +50,8 @@ variable "pod_network" {}
 
 variable "service_ip_range" {}
 
+variable "api_service_ip" {}
+
 variable "dns_service_ip" {}
 
 variable "vault_addr" {}

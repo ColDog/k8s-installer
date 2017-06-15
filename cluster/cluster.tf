@@ -1,3 +1,7 @@
+data "aws_route53_zone" "main" {
+  name = "${var.base_domain}"
+}
+
 module "vault" {
   source       = "./vault"
   cluster_name = "${var.cluster_name}"
@@ -19,7 +23,7 @@ module "iam" {
 module "etcd" {
   source = "./etcd"
 
-  dns_zone_id  = "${var.dns_zone_id}"
+  dns_zone_id  = "${data.aws_route53_zone.main.id}"
   base_domain  = "${var.base_domain}"
   cluster_name = "${var.cluster_name}"
 
@@ -41,7 +45,7 @@ module "etcd" {
 module "master" {
   source = "./master"
 
-  dns_zone_id  = "${var.dns_zone_id}"
+  dns_zone_id  = "${data.aws_route53_zone.main.id}"
   base_domain  = "${var.base_domain}"
   cluster_name = "${var.cluster_name}"
 
@@ -69,13 +73,14 @@ module "master" {
   dns_service_ip   = "${var.dns_service_ip}"
   node_network     = "${var.node_network}"
   service_ip_range = "${var.service_ip_range}"
+  api_service_ip   = "${var.api_service_ip}"
   pod_network      = "${var.pod_network}"
 }
 
 module "worker" {
   source = "./worker"
 
-  dns_zone_id  = "${var.dns_zone_id}"
+  dns_zone_id  = "${data.aws_route53_zone.main.id}"
   base_domain  = "${var.base_domain}"
   cluster_name = "${var.cluster_name}"
 
@@ -102,5 +107,6 @@ module "worker" {
   dns_service_ip   = "${var.dns_service_ip}"
   node_network     = "${var.node_network}"
   service_ip_range = "${var.service_ip_range}"
+  api_service_ip   = "${var.api_service_ip}"
   pod_network      = "${var.pod_network}"
 }

@@ -26,6 +26,7 @@ data "ignition_config" "master" {
     "${data.ignition_file.vault_login.id}",
     "${data.ignition_file.get_certs.id}",
     "${data.ignition_file.get_kubeconfig.id}",
+    "${data.ignition_file.get_servicekey.id}",
 
     // Bootstrap
     "${data.ignition_file.bootstrap_master.id}",
@@ -61,6 +62,7 @@ data "ignition_config" "worker" {
     "${data.ignition_file.vault_login.id}",
     "${data.ignition_file.get_certs.id}",
     "${data.ignition_file.get_kubeconfig.id}",
+    "${data.ignition_file.get_servicekey.id}",
 
     // Bootstrap
     "${data.ignition_file.bootstrap_master.id}",

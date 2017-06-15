@@ -8,6 +8,7 @@ module "node" {
   dns_service_ip   = "${var.dns_service_ip}"
   node_network     = "${var.node_network}"
   service_ip_range = "${var.service_ip_range}"
+  api_service_ip   = "${var.api_service_ip}"
   pod_network      = "${var.pod_network}"
 
   kubernetes_version = "${var.kubernetes_version}"

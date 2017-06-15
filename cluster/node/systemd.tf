@@ -1,14 +1,14 @@
 data "ignition_systemd_unit" "bootstrap_master" {
   name   = "bootstrap.service"
   enable = true
-  content = "${file("${path.module}/systemd/boostrap-master.service")}"
+  content = "${file("${path.module}/systemd/bootstrap-master.service")}"
 
 }
 
 data "ignition_systemd_unit" "bootstrap_worker" {
   name   = "bootstrap.service"
   enable = true
-  content = "${file("${path.module}/systemd/boostrap-worker.service")}"
+  content = "${file("${path.module}/systemd/bootstrap-worker.service")}"
 }
 
 data "ignition_systemd_unit" "metadata" {

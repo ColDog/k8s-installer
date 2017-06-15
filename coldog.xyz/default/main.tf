@@ -13,7 +13,6 @@ terraform {
 module "cluster" {
   source = "../../cluster"
 
-  dns_zone_id  = "Z3FHNMGH8LFH0Q"
   base_domain  = "coldog.xyz"
   cluster_name = "default"
   vault_addr   = "https://vault.coldog.xyz"
