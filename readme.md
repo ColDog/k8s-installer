@@ -38,7 +38,7 @@ EOF
 
 3. Run `terraform apply`.
 4. Unseal vault, to do this you must ssh into the machine and follow the unseal steps: https://www.vaultproject.io/docs/concepts/seal.html.
-5. Set the `VAULT_ADDR` environment variable in your terminal and ensure you are authorized to access vault through the ci.
+5. Set the `VAULT_ADDR` environment variable in your terminal and ensure you are authorized to access vault through the cli.
 
 ### 2. Setup Cluster
 

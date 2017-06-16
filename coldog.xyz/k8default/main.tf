@@ -4,7 +4,7 @@ provider "aws" {
 
 terraform {
   backend "s3" {
-    bucket = "state.coldog.xyz"
+    bucket = "coldog-tfstate"
     key    = "default.tfstate"
     region = "us-west-2"
   }
@@ -14,6 +14,7 @@ module "cluster" {
   source = "../../cluster"
 
   base_domain  = "coldog.xyz"
-  cluster_name = "default"
+  cluster_name = "k8default"
   vault_addr   = "https://vault.coldog.xyz"
+  asset_bucket = "coldog-cluster-assets"
 }

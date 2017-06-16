@@ -2,16 +2,24 @@ data "aws_route53_zone" "main" {
   name = "${var.base_domain}"
 }
 
+data "null_data_source" "api_server" {
+  outputs {
+    host = "${var.api_prefix}.${var.cluster_name}.${var.base_domain}"
+  }
+}
+
 module "vault" {
   source       = "./vault"
+
   cluster_name = "${var.cluster_name}"
 }
 
 module "vpc" {
   source = "./vpc"
 
-  vpc_name     = "${var.vpc_name}"
+  vpc_name     = "${var.cluster_name}"
   cidr         = "${var.node_network}"
+  asset_bucket = "${var.asset_bucket}"
 }
 
 module "iam" {
@@ -42,6 +50,27 @@ module "etcd" {
   ssh_key       = "${var.ssh_key}"
 }
 
+module "node" {
+  source = "./node"
+
+  etcd_nodes   = "${module.etcd.etcd_nodes}"
+  cluster_name = "${var.cluster_name}"
+  api_server   = "${data.null_data_source.api_server.outputs.host}"
+  vault_addr   = "${var.vault_addr}"
+
+  dns_service_ip   = "${var.dns_service_ip}"
+  node_network     = "${var.node_network}"
+  service_ip_range = "${var.service_ip_range}"
+  api_service_ip   = "${var.api_service_ip}"
+  pod_network      = "${var.pod_network}"
+
+  kubernetes_version = "${var.kubernetes_version}"
+  cni_version        = "${var.cni_version}"
+  flanneld_version   = "${var.flanneld_version}"
+
+  asset_bucket = "${var.asset_bucket}"
+}
+
 module "master" {
   source = "./master"
 
@@ -62,19 +91,12 @@ module "master" {
   instance_size = "${var.master_instance_size}"
   ssh_key       = "${var.ssh_key}"
 
-  etcd_nodes = ["${module.etcd.etcd_nodes}"]
+  user_data = "${module.node.worker_config}"
+  ami = "${module.node.ami}"
 
-  kubernetes_version = "${var.kubernetes_version}"
-  cni_version        = "${var.cni_version}"
-  flanneld_version   = "${var.flanneld_version}"
-
-  vault_addr = "${var.vault_addr}"
-
-  dns_service_ip   = "${var.dns_service_ip}"
-  node_network     = "${var.node_network}"
-  service_ip_range = "${var.service_ip_range}"
-  api_service_ip   = "${var.api_service_ip}"
-  pod_network      = "${var.pod_network}"
+  min = "${var.master_instances["min"]}"
+  max = "${var.master_instances["max"]}"
+  desired = "${var.master_instances["desired"]}"
 }
 
 module "worker" {
@@ -95,18 +117,10 @@ module "worker" {
   instance_size = "${var.worker_instance_size}"
   ssh_key       = "${var.ssh_key}"
 
-  etcd_nodes = ["${module.etcd.etcd_nodes}"]
+  user_data = "${module.node.worker_config}"
+  ami = "${module.node.ami}"
 
-  kubernetes_version = "${var.kubernetes_version}"
-  cni_version        = "${var.cni_version}"
-  flanneld_version   = "${var.flanneld_version}"
-
-  vault_addr = "${var.vault_addr}"
-
-  api_server       = "${module.master.api_server}"
-  dns_service_ip   = "${var.dns_service_ip}"
-  node_network     = "${var.node_network}"
-  service_ip_range = "${var.service_ip_range}"
-  api_service_ip   = "${var.api_service_ip}"
-  pod_network      = "${var.pod_network}"
+  min = "${var.worker_instances["min"]}"
+  max = "${var.worker_instances["max"]}"
+  desired = "${var.worker_instances["desired"]}"
 }

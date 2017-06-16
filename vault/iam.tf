@@ -1,6 +1,10 @@
 resource "aws_iam_instance_profile" "vault_profile" {
   name = "vault_profile"
   role = "${aws_iam_role.vault_role.name}"
+
+  provisioner "local-exec" {
+    command = "sleep 30"
+  }
 }
 
 resource "aws_iam_role" "vault_role" {

@@ -1,5 +1,7 @@
 variable "vpc_name" {}
 
+variable "asset_bucket" {}
+
 variable "cidr" {
   default = "10.0.0.0/16"
 }

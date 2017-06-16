@@ -43,6 +43,7 @@ data "aws_region" "current" {
   current = true
 }
 
+// TODO: allow different storage backends.
 data "ignition_file" "vault_config" {
   filesystem = "root"
   path       = "/etc/vault/config.hcl"

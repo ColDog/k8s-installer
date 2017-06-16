@@ -1,31 +1,13 @@
-module "node" {
-  source       = "../node"
-  etcd_nodes   = "${var.etcd_nodes}"
-  cluster_name = "${var.cluster_name}"
-  api_server   = "${aws_route53_record.api_server.fqdn}"
-  vault_addr   = "${var.vault_addr}"
-
-  dns_service_ip   = "${var.dns_service_ip}"
-  node_network     = "${var.node_network}"
-  service_ip_range = "${var.service_ip_range}"
-  api_service_ip   = "${var.api_service_ip}"
-  pod_network      = "${var.pod_network}"
-
-  kubernetes_version = "${var.kubernetes_version}"
-  cni_version        = "${var.cni_version}"
-  flanneld_version   = "${var.flanneld_version}"
-}
-
 resource "aws_launch_configuration" "master" {
   name                 = "${var.cluster_name}_master_lc.${uuid()}"
-  image_id             = "${module.node.ami}"
+  image_id             = "${var.ami}"
   instance_type        = "${var.instance_size}"
   key_name             = "${var.ssh_key}"
   iam_instance_profile = "${var.iam_profile}"
   security_groups      = ["${var.autoscaling_sgs}"]
 
   associate_public_ip_address = true
-  user_data                   = "${module.node.master_config}"
+  user_data                   = "${var.user_data}"
 
   lifecycle {
     ignore_changes        = ["name"]

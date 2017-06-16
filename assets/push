@@ -4,10 +4,10 @@ declare -a kube_versions=("v1.6.4")
 declare -a flanneld_versions=("v0.7.1")
 declare -a cni_versions=("v0.5.2")
 
-bucket="k8s.dist.coldog.xyz"
+bucket="$1"
 
-mkdir -p public/dist
-cd public/dist
+mkdir -p dist
+cd dist
 
 set -e
 

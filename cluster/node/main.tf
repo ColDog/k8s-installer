@@ -24,12 +24,14 @@ variable "api_service_ip" {}
 
 variable "dns_service_ip" {}
 
+variable "asset_bucket" {}
+
 output "worker_config" {
-  value = "${data.ignition_config.worker.rendered}"
+  value = "${data.ignition_config.worker_remote.rendered}"
 }
 
 output "master_config" {
-  value = "${data.ignition_config.master.rendered}"
+  value = "${data.ignition_config.master_remote.rendered}"
 }
 
 output "ami" {

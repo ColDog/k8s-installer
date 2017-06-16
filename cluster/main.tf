@@ -6,6 +6,19 @@ variable "cluster_name" {
   description = "Kubernetes cluster name, this will prefix the domain name and all resources."
 }
 
+variable "asset_bucket" {
+  description = "Asset bucket name. Must be created already."
+}
+
+variable "vault_addr" {
+  description = "Vault HTTPS endpoint."
+}
+
+variable "api_prefix" {
+  default = "k8s"
+  description = "API server DNS name prefix, computed to <api_prefix>.<cluster>.<base_domain>"
+}
+
 variable "ssh_key" {
   default     = "default_key"
   description = "SSH key name, this should be created in the aws dashboard."
@@ -41,18 +54,35 @@ variable "etcd_instance_size" {
   description = "AWS EC2 instance size."
 }
 
+variable "worker_instances" {
+  type = "map"
+  default = {
+    "min" = 1,
+    "max" = 1,
+    "desired" = 1,
+  }
+  description = "Worker autoscaling group defaults."
+}
+
+
 variable "worker_instance_size" {
   default     = "t2.small"
   description = "AWS EC2 instance size."
 }
 
+variable "master_instances" {
+  type = "map"
+  default = {
+    "min" = 1,
+    "max" = 1,
+    "desired" = 1,
+  }
+  description = "Master autoscaling group defaults."
+}
+
 variable "master_instance_size" {
   default     = "t2.small"
   description = "AWS EC2 instance size."
-}
-
-variable "vpc_name" {
-  default = "default"
 }
 
 variable "node_network" {
@@ -80,6 +110,6 @@ variable "dns_service_ip" {
   description = "The VIP (Virtual IP) address of the cluster DNS service. This IP must be in the range of the SERVICE_IP_RANGE and cannot be the first IP in the range. This same IP must be configured on all worker nodes to enable DNS service discovery."
 }
 
-variable "vault_addr" {
-  description = "Vault HTTPS endpoint."
+output "k8s_api" {
+  value = "https://${data.null_data_source.api_server.outputs.host}"
 }

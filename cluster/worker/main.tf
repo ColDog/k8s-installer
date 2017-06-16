@@ -1,18 +1,8 @@
-variable "dns_zone_id" {}
+variable "ami" {}
 
-variable "base_domain" {}
+variable "user_data" {}
 
 variable "cluster_name" {}
-
-variable "kubernetes_version" {}
-
-variable "cni_version" {}
-
-variable "flanneld_version" {}
-
-variable "etcd_nodes" {
-  type = "list"
-}
 
 variable "instance_size" {}
 
@@ -39,17 +29,3 @@ variable "min" {
 variable "desired" {
   default = 1
 }
-
-variable "api_server" {}
-
-variable "node_network" {}
-
-variable "pod_network" {}
-
-variable "service_ip_range" {}
-
-variable "api_service_ip" {}
-
-variable "dns_service_ip" {}
-
-variable "vault_addr" {}

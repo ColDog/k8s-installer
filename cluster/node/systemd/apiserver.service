@@ -10,8 +10,7 @@ EnvironmentFile=/etc/kubernetes/options.env
 ExecStartPre=-/usr/bin/docker stop apiserver.service
 ExecStartPre=-/usr/bin/docker rm apiserver.service
 ExecStart=/usr/bin/docker run --name=apiserver.service \
-    -p 443:443 \
-    -p 127.0.0.1:80:80 \
+    --net=host \
     -v /etc/kubernetes/secrets:/etc/kubernetes/secrets \
     quay.io/coreos/hyperkube:${K8S_VERSION}_coreos.0 \
     /hyperkube \
@@ -23,7 +22,7 @@ ExecStart=/usr/bin/docker run --name=apiserver.service \
     --bind-address=0.0.0.0 \
     --secure-port=443 \
     --insecure-port=80 \
-    --insecure-bind-address=0.0.0.0 \
+    --insecure-bind-address=127.0.0.1 \
     --service-cluster-ip-range=${K8S_SERVICE_IP_RANGE} \
     --etcd-servers=${K8S_ETCD_NODES} \
     --client-ca-file=/etc/kubernetes/secrets/apiserver-ca.pem \

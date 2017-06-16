@@ -15,6 +15,7 @@ K8S_API_SERVICE_IP=${var.api_service_ip}
 K8S_ETCD_NODES=${join(",", var.etcd_nodes)}
 FLANNELD_VERSION=${var.flanneld_version}
 CNI_VERSION=${var.cni_version}
+ASSET_URL=https://${var.asset_bucket}.s3.amazonaws.com
 EOF
   }
 }

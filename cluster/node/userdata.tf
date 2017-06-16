@@ -9,6 +9,8 @@ data "ignition_config" "master" {
     "${data.ignition_systemd_unit.controllermanager.id}",
     "${data.ignition_systemd_unit.scheduler.id}",
     "${data.ignition_systemd_unit.apiserver.id}",
+    "${data.ignition_systemd_unit.flanneld.id}",
+    "${data.ignition_systemd_unit.kubeproxy.id}",
   ]
 
   files = [

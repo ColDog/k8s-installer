@@ -30,3 +30,11 @@ variable "instances" {
   default = 1
   description = "Vault instance count, must be using a highly available backend."
 }
+
+output "instance_ips" {
+  value = ["${aws_instance.vault_node.*.public_ip}"]
+}
+
+output "vault_host" {
+  value = "${aws_route53_record.vault.fqdn}"
+}
