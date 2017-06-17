@@ -35,6 +35,8 @@ resource "aws_instance" "etcd_node" {
 
   iam_instance_profile = "${var.iam_etcd_profile_id}"
 
+  // TODO: Customize the disk. And other options here.
+
   lifecycle {
     # Ignore changes in the AMI which force recreation of the resource. This
     # avoids accidental deletion of nodes whenever a new CoreOS Release comes

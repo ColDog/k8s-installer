@@ -39,8 +39,3 @@ resource "aws_s3_bucket_policy" "state_bucket" {
 }
 EOF
 }
-
-resource "aws_s3_bucket" "state" {
-  bucket = "${var.asset_bucket}"
-  acl    = "private"
-}

@@ -3,6 +3,19 @@
 cluster="$1"
 user="$2"
 
+usage="create-user [cluster-name] [username]
+Create a vault user ready to receive a certificate for accessing the Kubernetes cluster."
+
+if [ -z $cluster ]; then
+    echo "$usage"
+    exit 1
+fi
+
+if [ -z $user ]; then
+    echo "$usage"
+    exit 1
+fi
+
 vault write ${cluster}/pki/roles/${user} \
     allowed_domains="$user" \
     allow_bare_domains=true \

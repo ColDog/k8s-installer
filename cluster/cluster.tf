@@ -2,12 +2,6 @@ data "aws_route53_zone" "main" {
   name = "${var.base_domain}"
 }
 
-data "null_data_source" "api_server" {
-  outputs {
-    host = "${var.api_prefix}.${var.cluster_name}.${var.base_domain}"
-  }
-}
-
 module "vault" {
   source       = "./vault"
 
@@ -55,7 +49,7 @@ module "node" {
 
   etcd_nodes   = "${module.etcd.etcd_nodes}"
   cluster_name = "${var.cluster_name}"
-  api_server   = "${data.null_data_source.api_server.outputs.host}"
+  api_server   = "${var.api_prefix}.${var.cluster_name}.${var.base_domain}"
   vault_addr   = "${var.vault_addr}"
 
   dns_service_ip   = "${var.dns_service_ip}"
@@ -91,7 +85,7 @@ module "master" {
   instance_size = "${var.master_instance_size}"
   ssh_key       = "${var.ssh_key}"
 
-  user_data = "${module.node.worker_config}"
+  user_data = "${module.node.master_config}"
   ami = "${module.node.ami}"
 
   min = "${var.master_instances["min"]}"
@@ -102,8 +96,6 @@ module "master" {
 module "worker" {
   source = "./worker"
 
-  dns_zone_id  = "${data.aws_route53_zone.main.id}"
-  base_domain  = "${var.base_domain}"
   cluster_name = "${var.cluster_name}"
 
   subnets     = ["${module.vpc.subnet_ids}"]

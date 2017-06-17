@@ -3,6 +3,8 @@
 cluster="$1"
 account="$2"
 
+set -e
+
 cat > ${cluster}-worker.policy.hcl <<EOF
 path "${cluster}/pki/issue/worker" {
     policy = "write"

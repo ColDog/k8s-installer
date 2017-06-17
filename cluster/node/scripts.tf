@@ -1,4 +1,30 @@
-data "ignition_file" "cluster_opts" {
+data "ignition_file" "opts_worker" {
+  path       = "/etc/kubernetes/options.env"
+  mode       = 0755
+  filesystem = "root"
+
+  content {
+    content = <<EOF
+K8S_API=${var.api_server}
+K8S_CLUSTER=${var.cluster_name}
+K8S_VERSION=${var.kubernetes_version}
+K8S_POD_NETWORK=${var.pod_network}
+K8S_SERVICE_IP_RANGE=${var.service_ip_range}
+K8S_API_SERVICE_IP=${var.api_service_ip}
+K8S_DNS_SERVICE_IP=${var.dns_service_ip}
+K8S_ETCD_NODES=${join(",", var.etcd_nodes)}
+K8S_KUBELET_SCHEDULABLE=true
+K8S_ROLE=worker
+
+VAULT_ADDR=${var.vault_addr}
+FLANNELD_VERSION=${var.flanneld_version}
+CNI_VERSION=${var.cni_version}
+ASSET_URL=https://${var.asset_bucket}.s3.amazonaws.com
+EOF
+  }
+}
+
+data "ignition_file" "opts_master" {
   path       = "/etc/kubernetes/options.env"
   mode       = 0755
   filesystem = "root"
@@ -12,7 +38,11 @@ K8S_VERSION=${var.kubernetes_version}
 K8S_POD_NETWORK=${var.pod_network}
 K8S_SERVICE_IP_RANGE=${var.service_ip_range}
 K8S_API_SERVICE_IP=${var.api_service_ip}
+K8S_DNS_SERVICE_IP=${var.dns_service_ip}
 K8S_ETCD_NODES=${join(",", var.etcd_nodes)}
+K8S_KUBELET_SCHEDULABLE=false
+K8S_ROLE=master
+
 FLANNELD_VERSION=${var.flanneld_version}
 CNI_VERSION=${var.cni_version}
 ASSET_URL=https://${var.asset_bucket}.s3.amazonaws.com

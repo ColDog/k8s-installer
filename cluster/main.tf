@@ -111,5 +111,5 @@ variable "dns_service_ip" {
 }
 
 output "k8s_api" {
-  value = "https://${data.null_data_source.api_server.outputs.host}"
+  value = "https://${var.api_prefix}.${var.cluster_name}.${var.base_domain}"
 }

@@ -18,6 +18,10 @@ set -e
 
 /opt/bin/get-certs master controllermanager
 /opt/bin/get-certs master scheduler
+/opt/bin/get-certs worker kubelet "" 127.0.0.1,${COREOS_EC2_IPV4_LOCAL}
+/opt/bin/get-certs worker kubeproxy
 
 /opt/bin/get-kubeconfig controllermanager
 /opt/bin/get-kubeconfig scheduler
+/opt/bin/get-kubeconfig kubelet
+/opt/bin/get-kubeconfig kubeproxy

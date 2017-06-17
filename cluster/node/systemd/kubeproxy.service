@@ -5,11 +5,12 @@ Requires=bootstrap.service
 After=bootstrap.service
 
 [Service]
+EnvironmentFile=/run/metadata/coreos
 EnvironmentFile=/etc/kubernetes/options.env
-ExecStartPre=/opt/bin/kubeproxy-installer
 ExecStart=/opt/bin/kube-proxy \
     --cluster-cidr=${K8S_POD_NETWORK} \
     --masquerade-all=true \
+    --hostname-override=${COREOS_EC2_IPV4_LOCAL} \
     --kubeconfig=/etc/kubernetes/secrets/kubeproxy.kubeconfig \
     --proxy-mode=iptables \
     --v=2
