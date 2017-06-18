@@ -25,6 +25,10 @@ resource "aws_autoscaling_group" "master" {
   vpc_zone_identifier  = ["${var.subnets}"]
   termination_policies = ["OldestLaunchConfiguration"]
 
+  // Will replace instances if HTTP health check is failing.
+  health_check_grace_period = 300
+  health_check_type         = "ELB"
+
   load_balancers = ["${aws_elb.master_api.id}"]
 
   tag {

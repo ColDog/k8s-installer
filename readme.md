@@ -1,14 +1,25 @@
 # Kubernetes Installer
 
-## Architecture
+## Features
+
+- Cluster certificates signed by and stored in vault.
+- Control plane in an autoscaling group with Healthchecks.
+- Configurable, uses Coreos ignition configuration for provisioning.
+- Built for security and high availability.
+
+## Overview
 
 ### Control Plane
 
-This is an opinionated Kubernetes installer for AWS. It provides terraform resources and scripts for setting up and managing a production ready cluster. The core pieces of the cluster are deployed as binaries running through systemd. Binaries are hosted in an s3 bucket in a common format for quick downloads from the machines and to ensure consistency and availability for the cluster.
+The Kubernetes control plane is created inside a master autoscaling group. This group can be scaled up and down dynamically. Additionally, the autoscaling healthchecks are connected directly to the Kubernetes api server. If an api server is failing it will be replaced by the autoscaling group.
 
 ### Vault
 
-Vault provides all of the certificates to each component of the cluster including local `kubeconfig` objects. Upon boot, each node will request the certificates it needs from vault. Authorization is handled through the vault aws-ec2 backend which allows vault to distinguish between worker nodes and master nodes. Worker nodes may create credentials for kubeproxy and kubelet services.
+Vault provides all of the certificates to each component of the cluster including local `kubeconfig` objects. Upon boot, each node will request the certificates it needs from vault. Authorization is handled through the vault aws-ec2 backend which allows vault to distinguish between worker nodes and master nodes. Worker nodes may create credentials for kubeproxy and kubelet services, whereas master nodes can create credentials for any user.
+
+Vault can also provide credentials for local users that have access to vault. An example of this is provided in the `scripts/vault/create-user` and `scripts/vault/get-kubeconfig` files.
+
+The cluster creation process involves setting up a vault `pki` backend and specific roles for the master and worker instances. This can be configured and this step handled externally.
 
 ## Getting Started
 
@@ -81,10 +92,10 @@ EOF
 ### 2. Setup Cluster
 
 1. Create a folder `mkdir ./k8s-cluster` to hold your terraform configuration.
-2. Copy the following configuration into `./default/main.tf`:
+2. Copy the following configuration into `./k8s-cluster/main.tf`:
 
 ```bash
-cat > ./default/main.tf <<EOF
+cat > ./k8s-cluster/main.tf <<EOF
 provider "aws" {
   region = "us-west-2"
 }
@@ -92,10 +103,9 @@ provider "aws" {
 module "cluster" {
   source = "../../cluster"
 
-  dns_zone_id  = "Z3FHNMGH8LFH0Q"
   base_domain  = "coldog.xyz"
   cluster_name = "default"
-  vault_addr   = "https://vault.coldog.xyz"
+  vault_addr   = "https://vault.my-domain.xyz"
 }
 EOF
 ```

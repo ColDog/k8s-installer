@@ -33,7 +33,7 @@ module "etcd" {
   iam_etcd_profile_id = "${module.iam.etcd_profile}"
 
   security_groups = [
-    "${module.vpc.sg_internal_instance}",
+    "${module.vpc.sg_worker}",
     "${module.vpc.sg_ssh}",
   ]
 
@@ -73,12 +73,12 @@ module "master" {
   cluster_name = "${var.cluster_name}"
 
   subnets     = ["${module.vpc.subnet_ids}"]
-  elb_sgs     = ["${module.vpc.sg_external_lb_https}"]
+  elb_sgs     = ["${module.vpc.sg_master_lb}"]
   iam_profile = "${module.iam.master_profile}"
 
   autoscaling_sgs = [
-    "${module.vpc.sg_internal_instance}",
-    "${module.vpc.sg_instance_lb_https}",
+    "${module.vpc.sg_master}",
+    "${module.vpc.sg_worker}",
     "${module.vpc.sg_ssh}",
   ]
 
@@ -102,7 +102,7 @@ module "worker" {
   iam_profile = "${module.iam.worker_profile}"
 
   autoscaling_sgs = [
-    "${module.vpc.sg_internal_instance}",
+    "${module.vpc.sg_worker}",
     "${module.vpc.sg_ssh}",
   ]
 

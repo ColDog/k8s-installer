@@ -9,6 +9,7 @@ EnvironmentFile=/etc/kubernetes/options.env
 ExecStartPre=-/usr/bin/docker stop scheduler.service
 ExecStartPre=-/usr/bin/docker rm scheduler.service
 ExecStart=/usr/bin/docker run --name=scheduler.service \
+    --net=host \
     -v /etc/kubernetes/secrets:/etc/kubernetes/secrets \
     quay.io/coreos/hyperkube:${K8S_VERSION}_coreos.0 \
     /hyperkube \

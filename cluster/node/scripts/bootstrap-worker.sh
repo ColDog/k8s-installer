@@ -2,10 +2,6 @@
 
 set -e
 
-/usr/bin/etcdctl \
-  --endpoints=${K8S_ETCD_NODES} \
-  set /flanneld/${K8S_CLUSTER}/config '{"Network": "'${K8S_POD_NETWORK}'"}'
-
 /usr/bin/mkdir -p /etc/kubernetes/secrets
 /usr/bin/mkdir -p /opt/downloads/ /opt/cni/bin/ /opt/bin /opt/installed
 
@@ -21,3 +17,7 @@ set -e
 
 /opt/bin/get-kubeconfig kubelet
 /opt/bin/get-kubeconfig kubeproxy
+
+/usr/bin/etcdctl \
+  --endpoints=${K8S_ETCD_NODES} \
+  set /flanneld/${K8S_CLUSTER}/config "{\"Network\":\"${K8S_POD_NETWORK}\",\"Backend\":{\"Type\":\"udp\",\"Port\":7890}}"

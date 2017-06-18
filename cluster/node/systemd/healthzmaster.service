@@ -1,0 +1,18 @@
+[Unit]
+Description=KubernetesScheduler
+Documentation=https://github.com/GoogleCloudPlatform/kubernetes
+Requires=bootstrap.service
+After=bootstrap.service
+
+[Service]
+EnvironmentFile=/etc/kubernetes/options.env
+ExecStartPre=-/usr/bin/docker stop healthzmaster.service
+ExecStartPre=-/usr/bin/docker rm healthzmaster.service
+ExecStart=/usr/bin/docker run --name=healthzmaster.service --net=host coldog/kube-master-healthz
+ExecStop=/usr/bin/docker stop healthzmaster.service
+Restart=on-failure
+RestartSec=15
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

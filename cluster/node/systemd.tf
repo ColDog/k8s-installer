@@ -57,3 +57,8 @@ data "ignition_systemd_unit" "scheduler" {
   content = "${file("${path.module}/systemd/scheduler.service")}"
 }
 
+data "ignition_systemd_unit" "healthzmaster" {
+  name   = "healthzmaster.service"
+  enable = true
+  content = "${file("${path.module}/systemd/healthzmaster.service")}"
+}

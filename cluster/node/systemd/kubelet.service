@@ -18,6 +18,7 @@ ExecStart=/opt/bin/kubelet \
     --kubeconfig=/etc/kubernetes/secrets/kubelet.kubeconfig \
     --serialize-image-pulls=false \
     --register-node=true \
+    ${K8S_KUBELET_TAINTS} \
     --tls-cert-file=/etc/kubernetes/secrets/kubelet.pem \
     --tls-private-key-file=/etc/kubernetes/secrets/kubelet-key.pem
 Restart=on-failure

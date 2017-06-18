@@ -10,16 +10,16 @@ output "subnet_ids" {
   value = ["${aws_subnet.main_subnets.*.id}"]
 }
 
-output "sg_external_lb_https" {
-  value = "${aws_security_group.external_lb_https.id}"
+output "sg_master_lb" {
+  value = "${aws_security_group.master_lb.id}"
 }
 
-output "sg_instance_lb_https" {
-  value = "${aws_security_group.instance_lb_https.id}"
+output "sg_master" {
+  value = "${aws_security_group.master.id}"
 }
 
-output "sg_internal_instance" {
-  value = "${aws_security_group.internal_instance.id}"
+output "sg_worker" {
+  value = "${aws_security_group.worker.id}"
 }
 
 output "sg_ssh" {
