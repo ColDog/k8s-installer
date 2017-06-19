@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+while true; do
+    echo '{"source": "my.tag", "message": "hello", "ts": "'$( date +%s )'"}'
+    sleep 0.5
+done
