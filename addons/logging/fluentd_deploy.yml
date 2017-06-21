@@ -1,0 +1,42 @@
+kind: Deployment
+apiVersion: extensions/v1beta1
+metadata:
+  labels:
+    k8s-app: fluentd-collector
+  name: fluentd-collector
+  namespace: kube-system
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      k8s-app: fluentd-collector
+  template:
+    metadata:
+      labels:
+        k8s-app: fluentd-collector
+    spec:
+      containers:
+      - name: fluentd-collector
+        image: coldog/fluentd-collector
+        ports:
+        - containerPort: 20001
+          name: ingestor
+          protocol: UDP
+      tolerations:
+      - key: node-role.kubernetes.io/master
+        effect: NoSchedule
+---
+kind: Service
+apiVersion: v1
+metadata:
+  labels:
+    k8s-app: fluentd-collector
+  name: fluentd-collector
+  namespace: kube-system
+spec:
+  ports:
+  - port: 20001
+    targetPort: 20001
+  selector:
+    k8s-app: fluentd-collector
