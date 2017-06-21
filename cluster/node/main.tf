@@ -26,6 +26,10 @@ variable "dns_service_ip" {}
 
 variable "asset_bucket" {}
 
+variable "etcd_provision_ip" {}
+
+variable "ssh_key" {}
+
 output "worker_config" {
   value = "${data.ignition_config.worker_remote.rendered}"
 }

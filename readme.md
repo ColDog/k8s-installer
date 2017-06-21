@@ -7,6 +7,12 @@
 - Configurable, uses Coreos ignition configuration for provisioning.
 - Built for security and high availability.
 
+## Future Work
+
+- Teardown scripts, remove vault certs for deleted nodes.
+- Highly available and configurable vault backends.
+- Calico networking plugin.
+
 ## Overview
 
 ### Control Plane
@@ -20,6 +26,8 @@ Vault provides all of the certificates to each component of the cluster includin
 Vault can also provide credentials for local users that have access to vault. An example of this is provided in the `scripts/vault/create-user` and `scripts/vault/get-kubeconfig` files.
 
 The cluster creation process involves setting up a vault `pki` backend and specific roles for the master and worker instances. This can be configured and this step handled externally.
+
+All vault certificates are only valid for 720 hours at the moment. This means you must cycle machines about once a month.
 
 ## Getting Started
 
@@ -109,3 +117,6 @@ module "cluster" {
 }
 EOF
 ```
+
+3. `terraform apply`
+

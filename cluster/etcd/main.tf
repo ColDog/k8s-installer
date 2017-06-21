@@ -25,3 +25,11 @@ variable "instances" {
 }
 
 variable "iam_etcd_profile_id" {}
+
+output "etcd_nodes" {
+  value = ["${formatlist("http://%s:2379", aws_route53_record.etc_a_nodes.*.fqdn)}"]
+}
+
+output "provision_node_ip" {
+  value = "${aws_instance.etcd_node.*.public_ip[0]}"
+}

@@ -19,4 +19,16 @@ module "cluster" {
   asset_bucket = "coldog-cluster-assets"
 
   etcd_instances = 1
+
+  worker_instances = {
+    desired = 1
+    min = 1
+    max = 1
+  }
+
+  master_instances = {
+    desired = 1
+    min = 1
+    max = 1
+  }
 }

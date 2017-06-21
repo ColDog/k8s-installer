@@ -14,6 +14,8 @@ K8S_API_SERVICE_IP=${var.api_service_ip}
 K8S_DNS_SERVICE_IP=${var.dns_service_ip}
 K8S_ETCD_NODES=${join(",", var.etcd_nodes)}
 K8S_ROLE=worker
+K8S_NETWORK_PLUGIN=cni
+K8S_NETWORK_BACKEND=flannel
 
 VAULT_ADDR=${var.vault_addr}
 FLANNELD_VERSION=${var.flanneld_version}
@@ -42,6 +44,8 @@ K8S_ETCD_NODES=${join(",", var.etcd_nodes)}
 K8S_KUBELET_SCHEDULABLE=false
 K8S_KUBELET_TAINTS=--register-with-taints=node-role.kubernetes.io/master=:NoSchedule
 K8S_ROLE=master
+K8S_NETWORK_PLUGIN=cni
+K8S_NETWORK_BACKEND=flannel
 
 FLANNELD_VERSION=${var.flanneld_version}
 CNI_VERSION=${var.cni_version}
@@ -164,5 +168,16 @@ data "ignition_file" "cni_installer" {
 
   content {
     content = "${file("${path.module}/scripts/cni-installer.sh")}"
+  }
+}
+
+resource "null_resource" "provision_etcd" {
+  provisioner "remote-exec" {
+    connection {
+      host = "${var.etcd_provision_ip}"
+    }
+    inline = [
+      "/usr/bin/etcdctl set /flanneld/${var.cluster_name}/config '{\"Network\":\"${var.pod_network}\",\"Backend\":{\"Type\":\"vxlan\"}}'"
+    ]
   }
 }

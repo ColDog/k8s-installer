@@ -24,7 +24,3 @@ resource "aws_route53_record" "etc_a_nodes" {
   name    = "etcd${count.index}.${var.cluster_name}"
   records = ["${aws_instance.etcd_node.*.private_ip[count.index]}"]
 }
-
-output "etcd_nodes" {
-  value = ["${formatlist("http://%s:2379", aws_route53_record.etc_a_nodes.*.fqdn)}"]
-}
